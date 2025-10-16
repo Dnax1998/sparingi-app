@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sparingi – logowanie i profile (Firebase)</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="./style.css" rel="stylesheet">
+</head>
+<body class="light">
+  <nav class="navbar navbar-expand-lg border-bottom">
+    <div class="container-fluid d-flex justify-content-between align-items-center">
+      <a class="navbar-brand fw-bold" href="#">⚽️ Sparingi</a>
+      <div class="d-flex align-items-center gap-2">
+        <span id="statusDot" class="badge text-bg-secondary">offline</span>
+        <button id="themeToggle" class="theme-toggle btn btn-sm btn-outline-dark" type="button">🌙 Tryb ciemny</button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container py-4">
+    <div id="err" class="alert alert-danger d-none"></div>
+    <div id="ok" class="alert alert-success d-none"></div>
+
+    <!-- EKRAN LOGOWANIA -->
+    <section id="authView" class="row justify-content-center">
+      <div class="col-12 col-md-7 col-lg-5">
+        <div class="card p-3">
+          <h5 class="fw-semibold mb-3">Zaloguj się / Zarejestruj</h5>
+          <form id="authForm" class="mb-3">
+            <div class="mb-2">
+              <label class="form-label">Email</label>
+              <input type="email" class="form-control" id="email" required />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Hasło</label>
+              <input type="password" class="form-control" id="password" minlength="6" required />
+            </div>
+            <div class="d-grid gap-2">
+              <button id="loginBtn"  type="button" class="btn btn-primary">🔐 Zaloguj</button>
+              <button id="registerBtn" type="button" class="btn btn-outline-primary">🆕 Zarejestruj</button>
+            </div>
+          </form>
+          <div class="text-muted small">Po zalogowaniu możesz dodawać i usuwać swoje mecze. Profil trenera ustawisz w zakładce poniżej.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- EKRAN APLIKACJI PO ZALOGOWANIU -->
+    <section id="appView" class="d-none">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="small">Zalogowano jako: <span id="userEmail" class="fw-semibold"></span></div>
+        <div class="d-flex gap-2">
+          <button id="refreshBtn" class="btn btn-sm btn-outline-secondary">🔄 Odśwież listę</button>
+          <button id="logoutBtn" class="btn btn-sm btn-outline-danger">🚪 Wyloguj</button>
+        </div>
+      </div>
+
+      <div class="row g-4">
+        <!-- Profil trenera -->
+        <div class="col-12 col-lg-4">
+          <div class="card p-3 h-100">
+            <h6 class="fw-semibold mb-3">Profil trenera</h6>
+            <form id="profileForm">
+              <div class="mb-2">
+                <label class="form-label">Nazwa drużyny</label>
+                <input type="text" class="form-control" id="profileTeam" />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Kontakt (tel/email/URL)</label>
+                <input type="text" class="form-control" id="profileContact" />
+              </div>
+              <div class="d-grid">
+                <button class="btn btn-outline-primary" type="submit">💾 Zapisz profil</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Formularz meczu -->
+        <div class="col-12 col-lg-4">
+          <div class="card p-3 h-100">
+            <h6 class="fw-semibold mb-3">Dodaj mecz</h6>
+            <form id="matchForm" novalidate>
+              <div class="mb-2">
+                <label class="form-label">Drużyna</label>
+                <input type="text" class="form-control" id="teamHost" required placeholder="Twoja drużyna" />
+              </div>
+              <div class="mb-2">
+                <label class="form-label">Poziom / rocznik</label>
+                <input type="text" class="form-control" id="level" required />
+              </div>
+              <div class="row g-2 mb-2">
+                <div class="col-6">
+                  <label class="form-label">Data</label>
+                  <input type="date" class="form-control" id="date" required />
+                </div>
+                <div class="col-6">
+                  <label class="form-label">Godzina</label>
+                  <input type="time" class="form-control" id="time" required />
+                </div>
+              </div>
+              <div class="mb-2">
+                <label class="form-label">Miejsce</label>
+                <input type="text" class="form-control" id="location" required />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Kontakt</label>
+                <input type="text" class="form-control" id="contact" required placeholder="+48 600 000 000 lub email/URL" />
+                <div class="small-muted mt-1">Dane widoczne publicznie.</div>
+              </div>
+              <div class="d-grid">
+                <button class="btn btn-primary" type="submit">➕ Dodaj mecz</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Lista meczów -->
+        <div class="col-12 col-lg-4">
+          <div class="card p-3">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h6 class="fw-semibold mb-0">Lista meczów</h6>
+              <div class="small-muted">Baza: Firestore (odczyt przy odświeżeniu)</div>
+            </div>
+            <div class="table-responsive">
+              <table class="table table-striped mb-0">
+                <thead>
+                  <tr>
+                    <th>Data</th>
+                    <th>Drużyna</th>
+                    <th>Poziom</th>
+                    <th>Miejsce</th>
+                    <th>Kontakt</th>
+                    <th>Akcje</th>
+                  </tr>
+                </thead>
+                <tbody id="matchesBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Firebase compat SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+  <!-- Aplikacja -->
+  <script src="./script.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
