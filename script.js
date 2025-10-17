@@ -20,6 +20,62 @@ const tabRegister = document.getElementById('tabRegister');
 const loginForm = document.getElementById('loginForm');
 const registerForm = document.getElementById('registerForm');
 const msg = document.getElementById('msg');
+// Pobranie przycisków i formularzy
+const googleLoginBtn = document.getElementById('googleLoginBtn');
+const googleRegisterBtn = document.getElementById('googleRegisterBtn');
+const loginForm = document.getElementById('loginForm');
+const registerForm = document.getElementById('registerForm');
+
+// 🔐 Logowanie przez e-mail
+loginForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  try {
+    await auth.signInWithEmailAndPassword(email, password);
+    showMsg('Zalogowano pomyślnie ✅', 'success');
+  } catch (err) {
+    showMsg('Błąd logowania: ' + err.message, 'danger');
+  }
+});
+
+// 🆕 Rejestracja przez e-mail
+registerForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const email = document.getElementById('regEmail').value.trim();
+  const p1 = document.getElementById('regPassword').value;
+  const p2 = document.getElementById('regPassword2').value;
+  if (p1 !== p2) return showMsg('Hasła się nie zgadzają ❌', 'warning');
+
+  try {
+    await auth.createUserWithEmailAndPassword(email, p1);
+    showMsg('Konto utworzone pomyślnie 🎉', 'success');
+  } catch (err) {
+    showMsg('Błąd rejestracji: ' + err.message, 'danger');
+  }
+});
+
+// 🔵 Logowanie przez Google
+googleLoginBtn.addEventListener('click', async () => {
+  const provider = new firebase.auth.GoogleAuthProvider();
+  try {
+    await auth.signInWithPopup(provider);
+    showMsg('Zalogowano przez Google ✅', 'success');
+  } catch (err) {
+    showMsg('Błąd logowania Google: ' + err.message, 'danger');
+  }
+});
+
+// 🟢 Rejestracja przez Google
+googleRegisterBtn.addEventListener('click', async () => {
+  const provider = new firebase.auth.GoogleAuthProvider();
+  try {
+    await auth.signInWithPopup(provider);
+    showMsg('Zarejestrowano przez Google 🎉', 'success');
+  } catch (err) {
+    showMsg('Błąd rejestracji Google: ' + err.message, 'danger');
+  }
+});
 
 function showLogin(){
   tabLogin.classList.add('active'); tabRegister.classList.remove('active');
