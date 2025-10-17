@@ -30,36 +30,37 @@
     <h1>Witaj, trenerze 👋</h1>
     <p>Zostałeś pomyślnie zalogowany do panelu.</p>
     <button id="logoutBtn" class="btn btn-danger logout-btn">Wyloguj się</button>
-  </div>
-
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 
-  <script>
-    // 🔹 Konfiguracja Firebase (TA SAMA co w script.js)
-    const firebaseConfig = {
-      apiKey: "AIzaSyBxRAxjv0uLoAf6Xj52VpQ-STNMAluHbo",
-      authDomain: "sparingi-app.firebaseapp.com",
-      projectId: "sparingi-app",
-      storageBucket: "sparingi-app.appspot.com",
-      messagingSenderId: "293589421755",
-      appId: "1:293589421755:web:e98887dfc5fb4a79aef61e"
-    };
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyBXwR3VojWqtQLA6FsXj2pVQsSTWNNAUhb0",
+    authDomain: "sparingi-app.firebaseapp.com",
+    projectId: "sparingi-app",
+    storageBucket: "sparingi-app.appspot.com",
+    messagingSenderId: "293859421755",
+    appId: "1:293859421755:web:e98887fdc5fb4a79aef61e"
+  };
 
-    // 🔹 Inicjalizacja Firebase
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
+  const app = firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
 
-    // 🔹 Obsługa przycisku "Wyloguj się"
-    document.getElementById('logoutBtn').addEventListener('click', async () => {
-      try {
-        await auth.signOut();
-        window.location.replace("index.html");
-      } catch (error) {
-        alert("Błąd wylogowania: " + error.message);
-      }
-    });
-  </script>
+  document.getElementById("logoutBtn").addEventListener("click", async () => {
+    try {
+      await auth.signOut();
+      localStorage.clear();
+      sessionStorage.clear();
+      console.log("Użytkownik wylogowany i dane wyczyszczone");
+      window.location.replace("index.html");
+    } catch (error) {
+      alert("Błąd wylogowania: " + error.message);
+    }
+  });
 
-</body>
-</html>
+  auth.onAuthStateChanged(user => {
+    if (!user) {
+      window.location.replace("index.html");
+    }
+  });
+</script>
