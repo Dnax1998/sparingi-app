@@ -25,7 +25,8 @@ const googleLoginBtn = document.getElementById('googleLoginBtn');
 const googleRegisterBtn = document.getElementById('googleRegisterBtn');
 
 // 🔐 Logowanie przez e-mail
-loginForm.addEventListener('submit', async (e) => {
+loginForm?.addEventListener('submit', async (e) => {
+
   e.preventDefault();
   const email = document.getElementById('loginEmail').value.trim();
   const password = document.getElementById('loginPassword').value;
