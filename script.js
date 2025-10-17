@@ -96,3 +96,17 @@ document.getElementById('googleRegisterBtn').addEventListener('click', async () 
     showMsg('Błąd logowania Google: ' + err.message, 'danger');
   }
 });
+// Sprawdzanie stanu logowania, aby uniknąć pętli odświeżania
+auth.onAuthStateChanged((user) => {
+  if (user) {
+    console.log("Zalogowany:", user.email);
+    // przekierowanie tylko jeśli nie jesteśmy już na stronie głównej logowania
+    if (!window.location.pathname.includes("dashboard.html")) {
+      // możesz zmienić "dashboard.html" na inną podstronę docelową
+      // window.location.href = "dashboard.html";
+    }
+  } else {
+    console.log("Brak zalogowanego użytkownika");
+  }
+});
+
