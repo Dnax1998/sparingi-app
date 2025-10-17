@@ -1,3 +1,5 @@
+document.addEventListener("DOMContentLoaded", () => {
+
 console.log("✅ script.js działa!");
 
 // Firebase config
@@ -93,4 +95,5 @@ auth.onAuthStateChanged((user) => {
   } else {
     console.log("❌ Użytkownik niezalogowany");
   }
+});
 });
