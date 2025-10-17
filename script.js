@@ -153,17 +153,13 @@ document.getElementById('googleRegisterBtn').addEventListener('click', async () 
 });
 // Sprawdzanie stanu logowania, aby uniknąć pętli odświeżania
 auth.onAuthStateChanged((user) => {
-  if (user) {
-    console.log("✅ Zalogowany użytkownik:", user.email);
+ if (user) {
+  console.log("✅ Zalogowany użytkownik:", user.email);
+  // Nie przekierowuj — zostaw użytkownika na stronie logowania
+} else {
+  console.log("❌ Użytkownik niezalogowany");
+}
 
-    // Jeśli jesteśmy na stronie logowania, przekieruj tylko raz
-    if (window.location.pathname.endsWith("index.html") || window.location.pathname === "/") {
-      console.log("➡️ Przekierowanie do dashboard...");
-      window.location.replace("dashboard.html"); // replace zamiast href — nie powoduje cofania w historii
-    }
-  } else {
-    console.log("❌ Użytkownik niezalogowany");
-  }
 });
 // Zatrzymuje odświeżanie formularzy
 document.querySelectorAll("form").forEach(form => {
