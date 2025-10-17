@@ -23,8 +23,6 @@ const msg = document.getElementById('msg');
 // Pobranie przycisków i formularzy
 const googleLoginBtn = document.getElementById('googleLoginBtn');
 const googleRegisterBtn = document.getElementById('googleRegisterBtn');
-const loginForm = document.getElementById('loginForm');
-const registerForm = document.getElementById('registerForm');
 
 // 🔐 Logowanie przez e-mail
 loginForm.addEventListener('submit', async (e) => {
