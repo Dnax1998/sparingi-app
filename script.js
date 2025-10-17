@@ -165,6 +165,5 @@ auth.onAuthStateChanged((user) => {
 });
 loginForm.addEventListener('submit', async (e) => {
   e.preventDefault(); // ⬅️ to już masz, ale zostaw koniecznie
-  ...
 });
 
