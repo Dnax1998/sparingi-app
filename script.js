@@ -109,4 +109,8 @@ auth.onAuthStateChanged((user) => {
     console.log("Brak zalogowanego użytkownika");
   }
 });
+loginForm.addEventListener('submit', async (e) => {
+  e.preventDefault(); // ⬅️ to już masz, ale zostaw koniecznie
+  ...
+});
 
