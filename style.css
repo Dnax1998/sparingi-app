@@ -9,10 +9,18 @@ body {
 
 /* Background and brand */
 body.login-bg {
-    background: url('./background.jpg') center right / cover no-repeat fixed;
-    background-color: #024731;
+    background-image: url('./background.jpg');
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover; /* dopasowuje tło do całej strony */
     background-attachment: fixed;
+    background-color: #024731; /* kolor wypełnienia na wszelki wypadek */
+    min-height: 100vh;
+    width: 100%;
+    margin: 0;
+    padding: 0;
 }
+
 
 .logo-brand{ height: 46px; width:auto; }
 .brand-text{ font-weight: 800; font-size: 1.4rem; color: #ffffff; text-shadow: 0 1px 2px rgba(0,0,0,.2); }
