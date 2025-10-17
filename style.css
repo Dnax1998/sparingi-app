@@ -1,11 +1,3 @@
-body {
-  background: url('./background.jpg') no-repeat right center fixed;
-  background-size: contain; /* dopasowuje proporcje obrazka bez rozciągania */
-  background-color: #024731; /* kolor wypełnienia po lewej stronie */
-}
-
-
-}
 
 /* Background and brand */
 html, body {
