@@ -1,3 +1,4 @@
+console.log("✅ script.js działa!");
 
 // Firebase config
 const firebaseConfig = {
