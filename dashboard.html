@@ -34,33 +34,39 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 
 <script>
+  // Konfiguracja Firebase
   const firebaseConfig = {
-    apiKey: "AIzaSyBXwR3VojWqtQLA6FsXj2pVQsSTWNNAUhb0",
+    apiKey: "AIzaSyBXwR3VojWqtQLA6FsXj2pVqsSTWNNAUhB0",
     authDomain: "sparingi-app.firebaseapp.com",
     projectId: "sparingi-app",
     storageBucket: "sparingi-app.appspot.com",
-    messagingSenderId: "293859421755",
-    appId: "1:293859421755:web:e98887fdc5fb4a79aef61e"
+    messagingSenderId: "293589421755",
+    appId: "1:293589421755:web:e98878dfc5fb479aef61e"
   };
 
-  const app = firebase.initializeApp(firebaseConfig);
+  // Inicjalizacja Firebase
+  firebase.initializeApp(firebaseConfig);
   const auth = firebase.auth();
 
+  // Obsługa przycisku "Wyloguj się"
   document.getElementById("logoutBtn").addEventListener("click", async () => {
     try {
       await auth.signOut();
-      localStorage.clear();
-      sessionStorage.clear();
-      console.log("Użytkownik wylogowany i dane wyczyszczone");
+      console.log("👋 Użytkownik wylogowany");
       window.location.replace("index.html");
     } catch (error) {
       alert("Błąd wylogowania: " + error.message);
     }
   });
 
-  auth.onAuthStateChanged(user => {
-    if (!user) {
-      window.location.replace("index.html");
+  // Monitorowanie stanu logowania (bez automatycznego wylogowania)
+  auth.onAuthStateChanged((user) => {
+    if (user) {
+      console.log("✅ Zalogowany użytkownik:", user.email);
+    } else {
+      console.log("❌ Brak zalogowanego użytkownika — możesz się zalogować ponownie.");
     }
   });
 </script>
+</body>
+</html>
