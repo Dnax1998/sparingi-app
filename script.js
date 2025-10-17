@@ -57,19 +57,25 @@ console.log("✅ Firebase connected!");
 
   // --- Logowanie e-mail ---
   if (loginForm) {
-    loginForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const email = document.getElementById("loginEmail").value.trim();
-      const password = document.getElementById("loginPassword").value;
+  loginForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const email = document.getElementById("loginEmail").value.trim();
+    const password = document.getElementById("loginPassword").value;
 
-      try {
-        await auth.signInWithEmailAndPassword(email, password);
-        showMsg("Zalogowano pomyślnie ✅", "success");
-      } catch (err) {
-        showMsg("Błąd logowania: " + err.message, "danger");
-      }
-    });
-  }
+    try {
+      await auth.signInWithEmailAndPassword(email, password);
+      showMsg("Zalogowano pomyślnie ✅", "success");
+      
+      // przekierowanie po zalogowaniu
+      setTimeout(() => {
+        window.location.replace("dashboard.html");
+      }, 800);
+      
+    } catch (err) {
+      showMsg("Błąd logowania: " + err.message, "danger");
+    }
+  });
+}
 
   // --- Rejestracja e-mail ---
   if (registerForm) {
@@ -95,15 +101,22 @@ console.log("✅ Firebase connected!");
   provider.setCustomParameters({ prompt: "select_account" });
 
   if (googleLoginBtn) {
-    googleLoginBtn.addEventListener("click", async () => {
-      try {
-        await auth.signInWithPopup(provider);
-        showMsg("Zalogowano przez Google ✅", "success");
-      } catch (err) {
-        showMsg("Błąd logowania Google: " + err.message, "danger");
-      }
-    });
-  }
+  googleLoginBtn.addEventListener("click", async () => {
+    try {
+      await auth.signInWithPopup(provider);
+      showMsg("Zalogowano przez Google ✅", "success");
+      
+      // przekierowanie po logowaniu Google
+      setTimeout(() => {
+        window.location.replace("dashboard.html");
+      }, 800);
+      
+    } catch (err) {
+      showMsg("Błąd logowania Google: " + err.message, "danger");
+    }
+  });
+}
+
 
   if (googleRegisterBtn) {
     googleRegisterBtn.addEventListener("click", async () => {
