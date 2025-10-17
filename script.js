@@ -5,12 +5,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // --- Firebase config ---
 const firebaseConfig = {
-  apiKey: "AIzaSyBXwR3VojWtQLA6FsXj2pVqsSTWNNAUhb0",
+  apiKey: "AIzaSyBXwR3VojWtQLA6FsXj2pVQsSTWNNAUhb0",
   authDomain: "sparingi-app.firebaseapp.com",
   projectId: "sparingi-app",
   storageBucket: "sparingi-app.firebasestorage.app",
   messagingSenderId: "293859421755",
-  appId: "1:293859421755:web:e9887fdc5fb4a79aef61e"
+  appId: "1:293859421755:web:e98887fdc5fb4a79aef61e"
 };
 
 firebase.initializeApp(firebaseConfig);
