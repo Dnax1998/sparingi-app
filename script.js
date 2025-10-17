@@ -153,14 +153,10 @@ document.getElementById('googleRegisterBtn').addEventListener('click', async () 
 // Sprawdzanie stanu logowania, aby uniknąć pętli odświeżania
 auth.onAuthStateChanged((user) => {
   if (user) {
-    console.log("Zalogowany:", user.email);
-    // przekierowanie tylko jeśli nie jesteśmy już na stronie głównej logowania
-   if (!window.location.pathname.includes("dashboard.html")) {
-
-      // możesz zmienić "dashboard.html" na inną podstronę docelową
-      // window.location.href = "dashboard.html";
-    }
+    console.log("✅ Zalogowany użytkownik:", user.email);
+    // Na razie nie przekierowujemy nigdzie, po prostu logujemy w konsoli
   } else {
-    console.log("Brak zalogowanego użytkownika");
+    console.log("🚪 Użytkownik niezalogowany");
   }
 });
+
