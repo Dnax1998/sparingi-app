@@ -116,18 +116,16 @@ console.log("✅ Firebase connected!");
     });
   }
 
-  // --- Monitorowanie stanu logowania ---
-  auth.onAuthStateChanged((user) => {
-    if (user) {
-      console.log("✅ Zalogowany użytkownik:", user.email);
-      if (window.location.pathname.endsWith("index.html") || window.location.pathname === "/") {
-        console.log("➡️ Przekierowanie do dashboard.html...");
-        window.location.replace("dashboard.html");
-      }
-    } else {
-      console.log("❌ Użytkownik niezalogowany");
-    }
-  });
+  // --- Monitorowanie stanu logowania (bez automatycznego przekierowania) ---
+auth.onAuthStateChanged((user) => {
+  if (user) {
+    console.log("✅ Użytkownik zalogowany:", user.email);
+    // Nie przekierowujemy automatycznie — użytkownik sam klika „Zaloguj się”
+  } else {
+    console.log("❌ Użytkownik niezalogowany");
+  }
+});
+
 
   console.log("🚀 Wszystkie listenery podpięte!");
 });
