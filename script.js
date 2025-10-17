@@ -13,9 +13,9 @@ const firebaseConfig = {
   appId: "1:293859421755:web:e9887fdc5fb4a79aef61e"
 };
 
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-  const db = firebase.firestore();
+  const app = firebase.initializeApp(firebaseConfig);
+const auth = app.auth();
+const db = app.firestore();
 
   // --- Elementy strony ---
   const tabLogin = document.getElementById('tabLogin');
