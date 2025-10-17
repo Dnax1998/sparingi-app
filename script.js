@@ -78,23 +78,35 @@ console.log("✅ Firebase connected!");
 }
 
   // --- Rejestracja e-mail ---
-  if (registerForm) {
-    registerForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const email = document.getElementById("regEmail").value.trim();
-      const p1 = document.getElementById("regPassword").value;
-      const p2 = document.getElementById("regPassword2").value;
+if (registerForm) {
+  registerForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-      if (p1 !== p2) return showMsg("Hasła się nie zgadzają ❌", "warning");
+    const email = document.getElementById("registerEmail").value.trim();
+    const password = document.getElementById("registerPassword").value;
+    const confirmPassword = document.getElementById("confirmPassword").value;
 
-      try {
-        await auth.createUserWithEmailAndPassword(email, p1);
-        showMsg("Konto utworzone 🎉 Logowanie...", "success");
-      } catch (err) {
-        showMsg("Błąd rejestracji: " + err.message, "danger");
-      }
-    });
-  }
+    // Sprawdzenie haseł
+    if (password !== confirmPassword) {
+      showMsg("Hasła nie są identyczne!", "danger");
+      return;
+    }
+
+    try {
+      await auth.createUserWithEmailAndPassword(email, password);
+      showMsg("Zarejestrowano pomyślnie ✅", "success");
+
+      // przekierowanie po udanej rejestracji
+      setTimeout(() => {
+        window.location.replace("dashboard.html");
+      }, 800);
+
+    } catch (err) {
+      showMsg("Błąd rejestracji: " + err.message, "danger");
+    }
+  });
+}
+
 
   // --- Logowanie Google ---
   const provider = new firebase.auth.GoogleAuthProvider();
