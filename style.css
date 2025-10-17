@@ -8,18 +8,23 @@ body {
 }
 
 /* Background and brand */
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
 body.login-bg {
     background-image: url('./background.jpg');
     background-position: center center;
     background-repeat: no-repeat;
-    background-size: cover; /* dopasowuje tło do całej strony */
+    background-size: cover;
     background-attachment: fixed;
-    background-color: #024731; /* kolor wypełnienia na wszelki wypadek */
-    min-height: 100vh;
+    background-color: #024731;
     width: 100%;
-    margin: 0;
-    padding: 0;
+    height: 100%;
 }
+
 
 
 .logo-brand{ height: 46px; width:auto; }
