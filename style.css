@@ -1,22 +1,64 @@
-body.dark { background:#0b1220; color:#e8ecf1; }
-body.dark .navbar, body.dark .card { background:#121a2a; border:1px solid #1e2a44; }
-body.light { background:#f8f9fa; color:#212529; }
-.theme-toggle { cursor:pointer; }
-.google-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: #fff;
-  border: 1px solid #dadce0;
-  border-radius: 4px;
-  padding: 8px 12px;
-  font-weight: 500;
-  color: #3c4043;
-  transition: background-color 0.2s;
+/* Background and brand */
+body.login-bg{
+  background: url('./img/background.jpg') right center / cover no-repeat fixed;
+  min-height: 100vh;
 }
-.google-btn:hover { background-color: #f7f8f8; }
-.google-icon {
-  width: 20px;
-  height: 20px;
-  margin-right: 8px;
+.logo-brand{ height: 46px; width:auto; }
+.brand-text{ font-weight: 800; font-size: 1.4rem; color: #ffffff; text-shadow: 0 1px 2px rgba(0,0,0,.2); }
+
+/* Card */
+.auth-wrapper{ max-width: 920px; margin-left: 2rem; }
+@media (max-width: 992px){ .auth-wrapper{ margin: 0 auto; padding: 0 1rem; } }
+.auth-card{
+  width: 520px;
+  background: rgba(6, 37, 18, 0.92);
+  border-radius: 18px;
+  padding: 22px 20px;
 }
+.form-control{
+  background: #fff;
+  border-radius: 10px;
+  border: none;
+  padding: .9rem 1rem;
+}
+.text-light{ color: #e7f3e7 !important; }
+
+/* Tabs */
+.tabs .tab{
+  border: none;
+  background: #0e3b24;
+  color: #a7e1a7;
+  font-weight: 700;
+}
+.tabs .tab.active{
+  background: #f1c232;
+  color: #1b2d21;
+}
+.tabs .tab:focus{ outline:none; }
+
+/* Buttons */
+.btn-gt-primary{
+  background: #f1c232;
+  color: #1b2d21;
+  font-weight: 800;
+  padding: .9rem 1rem;
+  border-radius: 12px;
+  border: none;
+}
+.btn-gt-primary:hover{ filter: brightness(.95); }
+
+.btn-google{
+  background: #fff;
+  color:#3c4043;
+  border:1px solid #dadce0;
+  display:flex; align-items:center; justify-content:center;
+  gap:.5rem;
+  padding:.8rem 1rem;
+  border-radius: 10px;
+  font-weight:600;
+}
+.btn-google:hover{ background:#f7f8f8; }
+.google-icon{ width:22px; height:22px; }
+
+/* Utility */
+.alert{ border-radius: 10px; }
