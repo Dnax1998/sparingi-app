@@ -4,14 +4,14 @@ document.addEventListener("DOMContentLoaded", () => {
   console.log("🔥 DOM wczytany, startujemy!");
 
   // --- Firebase config ---
-  const firebaseConfig = {
-    apiKey: "AIzaSyBvRx3iXy0uL4Qfe5jXp2VpGStNMAuHbo",
-    authDomain: "sparingi-app.firebaseapp.com",
-    projectId: "sparingi-app",
-    storageBucket: "sparingi-app.appspot.com",
-    messagingSenderId: "293598421755",
-    appId: "1:293598421755:web:e9887dfc45fb4a79aef61e"
-  };
+const firebaseConfig = {
+  apiKey: "AIzaSyBXwR3VojWtQLA6FsXj2pVqsSTWNNAUhb0",
+  authDomain: "sparingi-app.firebaseapp.com",
+  projectId: "sparingi-app",
+  storageBucket: "sparingi-app.firebasestorage.app",
+  messagingSenderId: "293859421755",
+  appId: "1:293859421755:web:e9887fdc5fb4a79aef61e"
+};
 
   firebase.initializeApp(firebaseConfig);
   const auth = firebase.auth();
