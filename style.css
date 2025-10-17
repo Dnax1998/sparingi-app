@@ -1,3 +1,8 @@
+body {
+  background: url('background.jpg') no-repeat center center fixed;
+  background-size: cover;
+}
+
 /* Background and brand */
 body.login-bg{
   background: url('./img/background.jpg') right center / cover no-repeat fixed;
