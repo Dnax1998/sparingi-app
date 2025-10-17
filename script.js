@@ -131,15 +131,22 @@ if (registerForm) {
 
 
   if (googleRegisterBtn) {
-    googleRegisterBtn.addEventListener("click", async () => {
-      try {
-        await auth.signInWithPopup(provider);
-        showMsg("Zarejestrowano przez Google 🎉", "success");
-      } catch (err) {
-        showMsg("Błąd rejestracji Google: " + err.message, "danger");
-      }
-    });
-  }
+  googleRegisterBtn.addEventListener("click", async () => {
+    try {
+      await auth.signInWithPopup(provider);
+      showMsg("Zarejestrowano przez Google ✅", "success");
+
+      // przekierowanie po rejestracji Google
+      setTimeout(() => {
+        window.location.replace("dashboard.html");
+      }, 800);
+
+    } catch (err) {
+      showMsg("Błąd rejestracji Google: " + err.message, "danger");
+    }
+  });
+}
+
 
   // --- Monitorowanie stanu logowania (bez automatycznego przekierowania) ---
 auth.onAuthStateChanged((user) => {
