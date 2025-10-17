@@ -16,7 +16,18 @@ body.login-bg{
 .brand-text{ font-weight: 800; font-size: 1.4rem; color: #ffffff; text-shadow: 0 1px 2px rgba(0,0,0,.2); }
 
 /* Card */
-.auth-wrapper{ max-width: 920px; margin-left: 2rem; }
+.auth-wrapper {
+  max-width: 920px;
+  margin-left: 6rem; /* przesunięcie w lewo */
+}
+
+@media (max-width: 992px) {
+  .auth-wrapper {
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+}
+
 @media (max-width: 992px){ .auth-wrapper{ margin: 0 auto; padding: 0 1rem; } }
 .auth-card{
   width: 520px;
