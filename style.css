@@ -8,10 +8,12 @@ body {
 }
 
 /* Background and brand */
-body.login-bg{
-  background: url('./img/background.jpg') right center / cover no-repeat fixed;
-  min-height: 100vh;
+body.login-bg {
+    background: url('./background.jpg') center right / cover no-repeat fixed;
+    background-color: #024731;
+    background-attachment: fixed;
 }
+
 .logo-brand{ height: 46px; width:auto; }
 .brand-text{ font-weight: 800; font-size: 1.4rem; color: #ffffff; text-shadow: 0 1px 2px rgba(0,0,0,.2); }
 
