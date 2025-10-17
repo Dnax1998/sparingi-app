@@ -155,7 +155,8 @@ auth.onAuthStateChanged((user) => {
   if (user) {
     console.log("Zalogowany:", user.email);
     // przekierowanie tylko jeśli nie jesteśmy już na stronie głównej logowania
-    if (!window.location.pathname.includes("dashboard.html")) {
+   if (!window.location.pathname.includes("dashboard.html")) {
+
       // możesz zmienić "dashboard.html" na inną podstronę docelową
       // window.location.href = "dashboard.html";
     }
