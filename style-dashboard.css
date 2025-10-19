@@ -1,0 +1,107 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: url('assets/background.jpg') no-repeat center right fixed;
+    background-size: cover;
+    color: #fff;
+    min-height: 100vh;
+    font-family: 'Poppins', sans-serif;
+}
+
+.logo-container {
+    position: absolute;
+    top: 25px;
+    left: 50px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.logo-img {
+    height: 50px;
+}
+
+.logo-text {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    font-size: 22px;
+    color: #ffffff;
+}
+
+main {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 120px 100px;
+}
+
+.tiles {
+    display: grid;
+    grid-template-columns: repeat(2, 220px);
+    grid-template-rows: repeat(2, 160px);
+    gap: 25px;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 30px;
+    border-radius: 20px;
+}
+
+.tile {
+    background-color: rgba(247, 243, 233, 0.9);
+    color: #0a8d35;
+    border-radius: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    text-align: center;
+    text-decoration: none;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.tile span.emoji {
+    font-size: 36px;
+    margin-bottom: 6px;
+}
+
+.tile:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+}
+
+.subpage {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 150px 120px;
+}
+
+.subpage h1 {
+    font-size: 36px;
+    font-weight: 700;
+    margin-bottom: 30px;
+    color: #ffffff;
+}
+
+.back-btn {
+    display: inline-block;
+    background: rgba(247, 243, 233, 0.9);
+    color: #0a8d35;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background 0.3s, transform 0.2s;
+}
+
+.back-btn:hover {
+    background: rgba(255, 255, 255, 1);
+    transform: scale(1.05);
+}
