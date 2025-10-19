@@ -5,7 +5,8 @@
 }
 
 body {
-    background: url('assets/background.jpg') no-repeat center right fixed;
+    background: url('../background.jpg') no-repeat center right fixed;
+
     background-size: cover;
     color: #fff;
     min-height: 100vh;
