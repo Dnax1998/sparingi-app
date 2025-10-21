@@ -1,0 +1,22 @@
+.edit-icon {
+  font-size: 16px;
+  color: #e63946;
+  margin-left: 8px;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.edit-icon:hover {
+  transform: scale(1.2);
+}
+
+.edit-input {
+  background: transparent;
+  border: 1px solid #e63946;
+  border-radius: 6px;
+  color: #fff;
+  font-size: 24px;
+  padding: 2px 8px;
+  outline: none;
+  text-align: center;
+}
