@@ -161,28 +161,7 @@
       input.replaceWith(nameDisplay);
     });
   });
-</script>
 
-  function enableEdit(fieldId, storageKey) {
-    const displayEl = document.getElementById(fieldId + "-display");
-    const editIcon = document.getElementById("edit-" + fieldId);
-
-    const savedValue = localStorage.getItem(storageKey);
-    if (savedValue) displayEl.textContent = savedValue;
-
-    editIcon.addEventListener("click", () => {
-      const newValue = prompt("Wpisz nową wartość:", displayEl.textContent);
-      if (newValue !== null && newValue.trim() !== "") {
-        displayEl.textContent = newValue;
-        localStorage.setItem(storageKey, newValue);
-      }
-    });
-  }
-
-  enableEdit("name", "userName");
-  enableEdit("club", "userClub");
-  enableEdit("categories", "userCategories");
-</script>
 
 </body>
 </html>
