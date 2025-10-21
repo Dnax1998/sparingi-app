@@ -1,282 +1,247 @@
 <!DOCTYPE html>
 <html lang="pl">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Profil – ZgranyTrener.pl</title>
-  <link rel="stylesheet" href="style-profil.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet" />
-  <script type="module" src="https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js"></script>
-  <script type="module" src="https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js"></script>
-  <script type="module" src="https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js"></script>
-</head>
-<body>
-  <header>
-    <div class="logo" style="position: absolute; top: 10px; left: 20px; display: flex; align-items: center;">
-      <img src="logo.png" alt="Logo ZgranyTrener.pl" height="50" />
-      <span style="color: white; font-weight: 700; font-size: 18px; margin-left: 10px;">ZgranyTrener.pl</span>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Profil – ZgranyTrener.pl</title>
+    <link rel="stylesheet" href="../style.css" />
+    <link rel="stylesheet" href="../style-profil.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+
+  <body>
+    <header>
+      <div class="logo" style="position: absolute; top: 15px; left: 25px; display: flex; align-items: center;">
+        <img src="profil/logo.png" alt="Logo" height="48" />
+        <span style="margin-left: 10px; font-weight: 700; font-size: 18px;">ZgranyTrener.pl</span>
+      </div>
+    </header>
+
+    <main class="profil-container">
+      <a href="dashboard.html" class="back-btn">← Powrót</a>
+
+      <div class="avatar-container">
+        <img id="avatar" src="profil/avatar1.png" alt="Avatar" class="avatar" />
+        <button id="change-avatar" class="change-avatar-btn">Zmień avatar</button>
+      </div>
+
+      <h1 id="user-name">Mateusz Bajera</h1>
+      <p class="role">Trener</p>
+
+      <section class="stats">
+        <div class="info-box">
+          <h3>Klub</h3>
+          <p id="club-display">Semp Warszawa</p>
+          <span id="edit-club" class="edit-icon" title="Edytuj klub">✏️</span>
+        </div>
+
+        <div class="info-box">
+          <h3>Kategorie wiekowe</h3>
+          <p id="categories-display">U7, U10</p>
+          <span id="edit-categories" class="edit-icon" title="Edytuj kategorie wiekowe">✏️</span>
+        </div>
+      </section>
+
+      <section class="match-stats">
+        <div class="match-box">
+          <h4 id="played-count">16</h4>
+          <p>Rozegrane sparingi</p>
+        </div>
+        <div class="match-box">
+          <h4 id="planned-count">4</h4>
+          <p>Zaplanowane sparingi</p>
+        </div>
+      </section>
+
+      <section class="recent-matches">
+        <h3>Ostatnie sparingi</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Data</th>
+              <th>Kategoria</th>
+              <th>Mecz</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>13.04.2024</td><td>U11</td><td>AP Młodziaki vs UKS Wilanów</td></tr>
+            <tr><td>06.04.2024</td><td>U9</td><td>FC Talent vs AP Młodziaki</td></tr>
+            <tr><td>24.03.2024</td><td>U12</td><td>AP Młodziaki vs MKS Delta</td></tr>
+          </tbody>
+        </table>
+      </section>
+    </main>
+
+    <!-- Modal do wyboru kategorii -->
+    <div id="category-modal" class="modal">
+      <div class="modal-content">
+        <h3>Wybierz kategorie wiekowe</h3>
+        <div id="category-options"></div>
+        <button id="save-categories" class="save-btn">Zapisz</button>
+      </div>
     </div>
-  </header>
 
-  <main class="profil-container">
-    <a href="dashboard.html" class="back-btn">← Powrót</a>
+    <!-- Firebase + logika -->
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+      import {
+        getAuth,
+        onAuthStateChanged
+      } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+      import {
+        getFirestore,
+        doc,
+        getDoc,
+        setDoc,
+        updateDoc
+      } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    <div class="avatar-container">
-      <img id="user-avatar" src="avatar1.png" alt="Avatar" class="avatar" />
-      <button id="change-avatar" class="change-avatar-btn">Zmień avatar</button>
-    </div>
+      // 🔥 Twoja konfiguracja Firebase
+      const firebaseConfig = {
+        apiKey: "AIzaSyBXwR3VojWtQLA6FsXj2pVQsSTWNNAUhb0",
+        authDomain: "sparingi-app.firebaseapp.com",
+        projectId: "sparingi-app",
+        storageBucket: "sparingi-app.firebasestorage.app",
+        messagingSenderId: "293859421755",
+        appId: "1:293859421755:web:e98887fdc5fb4a79aef61e"
+      };
 
-    <h1 id="user-name">Użytkownik</h1>
-    <p class="role">Trener</p>
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const db = getFirestore(app);
 
-    <section class="stats">
-      <div class="info-box">
-        <h3>Klub</h3>
-        <p id="club-display">Brak</p>
-        <span id="edit-club" class="edit-icon">✏️</span>
-      </div>
-      <div class="info-box">
-        <h3>Kategorie wiekowe</h3>
-        <p id="categories-display">Brak</p>
-        <span id="edit-categories" class="edit-icon">✏️</span>
-      </div>
-    </section>
+      const avatar = document.getElementById("avatar");
+      const changeAvatar = document.getElementById("change-avatar");
+      const userName = document.getElementById("user-name");
+      const clubDisplay = document.getElementById("club-display");
+      const editClub = document.getElementById("edit-club");
+      const categoriesDisplay = document.getElementById("categories-display");
+      const editCategories = document.getElementById("edit-categories");
+      const modal = document.getElementById("category-modal");
+      const categoryOptions = document.getElementById("category-options");
+      const saveCategories = document.getElementById("save-categories");
 
-    <section class="match-stats">
-      <div class="match-box">
-        <h4>16</h4>
-        <p>Rozegrane sparingi</p>
-      </div>
-      <div class="match-box">
-        <h4>4</h4>
-        <p>Zaplanowane sparingi</p>
-      </div>
-    </section>
+      const categoriesList = [
+        "U6", "U7", "U8", "U9", "U10", "U11", "U12",
+        "U13", "U14", "U15", "U16", "U17", "U18", "U19"
+      ];
 
-    <section class="recent-matches">
-      <h3>Ostatnie sparingi</h3>
-      <table>
-        <tr><th>Data</th><th>Kategoria</th><th>Mecz</th></tr>
-        <tr><td>13.04.2024</td><td>U11</td><td>AP Młodziaki vs UKS Wilanów</td></tr>
-        <tr><td>06.04.2024</td><td>U9</td><td>FC Talent vs AP Młodziaki</td></tr>
-        <tr><td>24.03.2024</td><td>U12</td><td>AP Młodziaki vs MKS Delta</td></tr>
-      </table>
-    </section>
-  </main>
-
-  <!-- Modal do wyboru kategorii -->
-  <div id="category-modal" class="modal" style="display:none;">
-    <div class="modal-content">
-      <h3>Wybierz kategorie wiekowe</h3>
-      <div id="category-options"></div>
-      <button id="save-categories" class="save-btn">Zapisz</button>
-    </div>
-  </div>
-
-  <style>
-    .modal {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.6);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 999;
-    }
-    .modal-content {
-      background: white;
-      border-radius: 10px;
-      padding: 20px;
-      width: 300px;
-      text-align: center;
-    }
-    .modal-content h3 {
-      margin-bottom: 10px;
-    }
-    .modal-content label {
-      display: block;
-      text-align: left;
-    }
-    .save-btn {
-      background: #1e7e34;
-      color: white;
-      border: none;
-      padding: 8px 14px;
-      margin-top: 10px;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-    .save-btn:hover {
-      background: #28a745;
-    }
-    .match-stats {
-      display: flex;
-      justify-content: center;
-      gap: 40px;
-      margin-top: 20px;
-    }
-    .match-box {
-      background: rgba(0,0,0,0.3);
-      color: white;
-      border-radius: 15px;
-      padding: 20px 40px;
-      text-align: center;
-      min-width: 200px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-    }
-    .match-box h4 {
-      font-size: 32px;
-      margin: 0;
-    }
-    .match-box p {
-      margin: 5px 0 0;
-    }
-  </style>
-
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-
-    // 🔥 Twoja konfiguracja Firebase
-    const firebaseConfig = {
-      apiKey: "AIzaSyBXwR3VojWtQLA6FsXj2pVQsSTWNNAUhb0",
-      authDomain: "sparingi-app.firebaseapp.com",
-      projectId: "sparingi-app",
-      storageBucket: "sparingi-app.firebasestorage.app",
-      messagingSenderId: "293859421755",
-      appId: "1:293859421755:web:e98887fdc5fb4a79aef61e"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
-    const userName = document.getElementById("user-name");
-    const avatarEl = document.getElementById("user-avatar");
-    const changeBtn = document.getElementById("change-avatar");
-    const clubDisplay = document.getElementById("club-display");
-    const clubEdit = document.getElementById("edit-club");
-    const categoriesDisplay = document.getElementById("categories-display");
-    const categoriesEdit = document.getElementById("edit-categories");
-
-    const modal = document.getElementById("category-modal");
-    const optionsContainer = document.getElementById("category-options");
-    const saveBtn = document.getElementById("save-categories");
-
-    const avatars = ["avatar1.png", "avatar2.png"];
-
-    const allCategories = ["U6","U7","U8","U9","U10","U11","U12","U13","U14","U15","U16","U17","U18","U19"];
-
-    onAuthStateChanged(auth, async (user) => {
-      if (!user) {
-        window.location.href = "index.html";
-        return;
-      }
-
-      userName.textContent = user.displayName || "Trener";
-
-      const userRef = doc(db, "users", user.uid);
-      const docSnap = await getDoc(userRef);
-
-      if (docSnap.exists()) {
-        const data = docSnap.data();
-        clubDisplay.textContent = data.club || "Brak";
-        categoriesDisplay.textContent = data.categories?.join(", ") || "Brak";
-        avatarEl.src = data.avatar || "avatar1.png";
-      } else {
-        await setDoc(userRef, { club: "", categories: [], avatar: "avatar1.png" });
-      }
-
-      // 🔄 zmiana avatara
-      // ✏️ edycja imienia i nazwiska
-const nameDisplay = document.getElementById("user-name");
-const nameEditIcon = document.createElement("span");
-nameEditIcon.textContent = "✏️";
-nameEditIcon.classList.add("edit-icon");
-nameDisplay.insertAdjacentElement("afterend", nameEditIcon);
-
-nameEditIcon.addEventListener("click", () => {
-  const currentName = nameDisplay.textContent.trim();
-  const input = document.createElement("input");
-  input.type = "text";
-  input.value = currentName;
-  input.style.fontSize = "24px";
-  input.style.textAlign = "center";
-  input.style.fontWeight = "700";
-  input.style.borderRadius = "8px";
-  input.style.padding = "4px 8px";
-  input.style.border = "none";
-  input.style.outline = "none";
-  input.style.background = "#fff";
-  input.style.color = "#000";
-  nameDisplay.replaceWith(input);
-  input.focus();
-
-  const saveChange = async () => {
-    const newName = input.value.trim() || currentName;
-    const newSpan = document.createElement("h1");
-    newSpan.id = "user-name";
-    newSpan.textContent = newName;
-    newSpan.style.fontSize = "28px";
-    newSpan.style.fontWeight = "700";
-    input.replaceWith(newSpan);
-    newSpan.insertAdjacentElement("afterend", nameEditIcon);
-    await updateDoc(doc(db, "users", user.uid), { name: newName });
-  };
-
-  input.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") saveChange();
-  });
-
-  input.addEventListener("blur", saveChange);
-});
-
-      changeBtn.addEventListener("click", async () => {
-        const current = avatarEl.src.split("/").pop();
-        const next = avatars[(avatars.indexOf(current) + 1) % avatars.length];
-        avatarEl.src = next;
-        await updateDoc(userRef, { avatar: next });
+      // 🔄 Zmiana avatara
+      changeAvatar.addEventListener("click", async () => {
+        const currentSrc = avatar.getAttribute("src");
+        const newSrc = currentSrc.includes("avatar1.png")
+          ? "profil/avatar2.png"
+          : "profil/avatar1.png";
+        avatar.src = newSrc;
+        if (auth.currentUser)
+          await updateDoc(doc(db, "users", auth.currentUser.uid), { avatar: newSrc });
       });
 
-      // ✏️ edycja klubu
-      clubEdit.addEventListener("click", async () => {
-        const newClub = prompt("Wpisz nazwę klubu:", clubDisplay.textContent);
-        if (newClub) {
+      // ✏️ Edycja imienia i nazwiska
+      const nameEditIcon = document.createElement("span");
+      nameEditIcon.textContent = "✏️";
+      nameEditIcon.classList.add("edit-icon");
+      userName.insertAdjacentElement("afterend", nameEditIcon);
+
+      nameEditIcon.addEventListener("click", () => {
+        const currentName = userName.textContent.trim();
+        const input = document.createElement("input");
+        input.type = "text";
+        input.value = currentName;
+        input.style.fontSize = "24px";
+        input.style.textAlign = "center";
+        input.style.fontWeight = "700";
+        input.style.borderRadius = "8px";
+        input.style.padding = "4px 8px";
+        input.style.border = "none";
+        input.style.outline = "none";
+        input.style.background = "#fff";
+        input.style.color = "#000";
+        userName.replaceWith(input);
+        input.focus();
+
+        const saveChange = async () => {
+          const newName = input.value.trim() || currentName;
+          const newSpan = document.createElement("h1");
+          newSpan.id = "user-name";
+          newSpan.textContent = newName;
+          newSpan.style.fontSize = "28px";
+          newSpan.style.fontWeight = "700";
+          input.replaceWith(newSpan);
+          newSpan.insertAdjacentElement("afterend", nameEditIcon);
+          if (auth.currentUser)
+            await updateDoc(doc(db, "users", auth.currentUser.uid), { name: newName });
+        };
+
+        input.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") saveChange();
+        });
+
+        input.addEventListener("blur", saveChange);
+      });
+
+      // ✏️ Edycja klubu
+      editClub.addEventListener("click", async () => {
+        const newClub = prompt("Podaj nazwę klubu:", clubDisplay.textContent.trim());
+        if (newClub && auth.currentUser) {
           clubDisplay.textContent = newClub;
-          await updateDoc(userRef, { club: newClub });
+          await updateDoc(doc(db, "users", auth.currentUser.uid), { club: newClub });
         }
       });
 
-      // 🧒 wybór kategorii (popup)
-      categoriesEdit.addEventListener("click", async () => {
-        modal.style.display = "flex";
-        optionsContainer.innerHTML = "";
-        allCategories.forEach(cat => {
-          const div = document.createElement("label");
-          const input = document.createElement("input");
-          input.type = "checkbox";
-          input.value = cat;
-          if (categoriesDisplay.textContent.includes(cat)) input.checked = true;
-          div.appendChild(input);
-          div.appendChild(document.createTextNode(" " + cat));
-          optionsContainer.appendChild(div);
+      // ✏️ Kategorie wiekowe
+      editCategories.addEventListener("click", () => {
+        categoryOptions.innerHTML = "";
+        categoriesList.forEach(cat => {
+          const label = document.createElement("label");
+          const checkbox = document.createElement("input");
+          checkbox.type = "checkbox";
+          checkbox.value = cat;
+          label.appendChild(checkbox);
+          label.append(cat);
+          categoryOptions.appendChild(label);
         });
+        modal.style.display = "flex";
       });
 
-      saveBtn.addEventListener("click", async () => {
-        const checked = [...optionsContainer.querySelectorAll("input:checked")].map(i => i.value);
-        categoriesDisplay.textContent = checked.join(", ") || "Brak";
+      saveCategories.addEventListener("click", async () => {
+        const selected = Array.from(categoryOptions.querySelectorAll("input:checked")).map(c => c.value);
+        categoriesDisplay.textContent = selected.join(", ") || "Brak";
         modal.style.display = "none";
-        await updateDoc(userRef, { categories: checked });
+        if (auth.currentUser)
+          await updateDoc(doc(db, "users", auth.currentUser.uid), { categories: selected });
       });
 
-      // zamykanie modala po kliknięciu w tło
       modal.addEventListener("click", (e) => {
         if (e.target === modal) modal.style.display = "none";
       });
-    });
-  </script>
-</body>
+
+      // 🔑 Autoryzacja
+      onAuthStateChanged(auth, async (user) => {
+        if (user) {
+          const ref = doc(db, "users", user.uid);
+          const snap = await getDoc(ref);
+          if (snap.exists()) {
+            const data = snap.data();
+            userName.textContent = data.name || user.displayName || "Trener";
+            clubDisplay.textContent = data.club || "Brak klubu";
+            categoriesDisplay.textContent = data.categories?.join(", ") || "Brak";
+            avatar.src = data.avatar || "profil/avatar1.png";
+          } else {
+            await setDoc(ref, {
+              name: user.displayName || "Trener",
+              club: "Brak klubu",
+              categories: [],
+              avatar: "profil/avatar1.png"
+            });
+          }
+        } else {
+          window.location.href = "index.html";
+        }
+      });
+    </script>
+  </body>
 </html>
