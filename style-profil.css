@@ -103,3 +103,30 @@ h1 {
   display: inline-block;
   margin-top: 10px;
 }
+/* --- Nagłówek jak na dashboardzie --- */
+.navbar {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  display: flex;
+  align-items: center;
+  z-index: 100;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-container img {
+  height: 50px;
+  width: auto;
+}
+
+.logo-text {
+  font-size: 20px;
+  font-weight: 700;
+  color: white;
+  font-family: "Montserrat", sans-serif;
+}
