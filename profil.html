@@ -86,114 +86,136 @@
   <!-- 🔒 Zabezpieczenie strony przed wejściem bez logowania -->
   <script src="auth-check.js"></script>
 
-  <!-- ✅ Jeden poprawny skrypt -->
-  <script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const nameDisplay = document.getElementById("name-display");
-    const editNameBtn = document.getElementById("edit-name");
-    const clubDisplay = document.getElementById("club-display");
-    const editClubBtn = document.getElementById("edit-club");
-    const categoriesDisplay = document.getElementById("categories-display");
-    const editCategoriesBtn = document.getElementById("edit-categories");
+  <!-- 🚀 Połączenie z Firebase -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
-    // --- Imię i nazwisko ---
-    const savedName = localStorage.getItem("userName");
-    if (savedName) nameDisplay.textContent = savedName;
+    const firebaseConfig = {
+      apiKey: "TU_WKLEJ_SWÓJ_API_KEY",
+      authDomain: "TU_WKLEJ_SWÓJ_AUTH_DOMAIN",
+      projectId: "TU_WKLEJ_SWÓJ_PROJECT_ID",
+      storageBucket: "TU_WKLEJ_SWÓJ_STORAGE_BUCKET",
+      messagingSenderId: "TU_WKLEJ_SWÓJ_SENDER_ID",
+      appId: "TU_WKLEJ_SWÓJ_APP_ID"
+    };
 
-    editNameBtn.addEventListener("click", () => {
-      const currentName = nameDisplay.textContent;
-      const input = document.createElement("input");
-      input.type = "text";
-      input.value = currentName;
-      input.classList.add("edit-input");
-      nameDisplay.replaceWith(input);
-      input.focus();
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-      const save = () => {
-        const newName = input.value.trim() || "Adam Nowak";
-        localStorage.setItem("userName", newName);
-        const span = document.createElement("span");
-        span.id = "name-display";
-        span.textContent = newName;
-        input.replaceWith(span);
-      };
-
-      input.addEventListener("blur", save);
-      input.addEventListener("keydown", (e) => { if (e.key === "Enter") save(); });
-    });
-
-    // --- Klub ---
-    const savedClub = localStorage.getItem("userClub");
-    if (savedClub) clubDisplay.textContent = savedClub;
-
-    editClubBtn.addEventListener("click", () => {
-      const current = clubDisplay.textContent;
-      const newVal = prompt("Podaj nazwę klubu:", current);
-      if (newVal && newVal.trim() !== "") {
-        clubDisplay.textContent = newVal;
-        localStorage.setItem("userClub", newVal);
+    // 🔒 Sprawdzenie logowania
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        window.location.href = "login.html";
+        return;
       }
+
+      const userRef = doc(db, "users", user.uid);
+      const docSnap = await getDoc(userRef);
+
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        document.getElementById("name-display").textContent = data.name || user.displayName || "Brak";
+        document.getElementById("club-display").textContent = data.club || "Brak";
+        document.getElementById("categories-display").textContent = (data.categories || []).join(", ");
+      } else {
+        await setDoc(userRef, { name: user.displayName || "", club: "", categories: [] });
+      }
+
+      // Funkcja zapisu
+      window.saveProfileData = async (newData) => {
+        await setDoc(userRef, newData, { merge: true });
+      };
     });
+  </script>
 
-    // --- Kategorie wiekowe (multi-select) ---
-    const savedCategories = JSON.parse(localStorage.getItem("userCategories") || "[]");
-    if (savedCategories.length) categoriesDisplay.textContent = savedCategories.join(", ");
+  <!-- ✏️ Skrypt do edycji profilu -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const nameDisplay = document.getElementById("name-display");
+      const editNameBtn = document.getElementById("edit-name");
+      const clubDisplay = document.getElementById("club-display");
+      const editClubBtn = document.getElementById("edit-club");
+      const categoriesDisplay = document.getElementById("categories-display");
+      const editCategoriesBtn = document.getElementById("edit-categories");
 
-    editCategoriesBtn.addEventListener("click", () => {
-      const options = ["U6","U7","U8","U9","U10","U11","U12","U13","U14","U15","U16","U17","U18","U19"];
-      const currentValues = savedCategories;
+      // --- Edycja imienia ---
+      editNameBtn.addEventListener("click", () => {
+        const input = document.createElement("input");
+        input.type = "text";
+        input.value = nameDisplay.textContent;
+        nameDisplay.replaceWith(input);
+        input.focus();
 
-      const overlay = document.createElement("div");
-      overlay.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:1000;";
+        const save = async () => {
+          const newName = input.value.trim() || "Bez imienia";
+          const span = document.createElement("span");
+          span.id = "name-display";
+          span.textContent = newName;
+          input.replaceWith(span);
+          if (window.saveProfileData) saveProfileData({ name: newName });
+        };
 
-      const box = document.createElement("div");
-      box.style.cssText = "background:rgba(0,50,0,0.95);padding:25px 35px;border-radius:16px;box-shadow:0 4px 20px rgba(0,0,0,0.6);color:#fff;font-family:'Montserrat',sans-serif;font-size:16px;";
-      box.innerHTML = "<h3 style='text-align:center;margin-bottom:15px;'>Wybierz kategorie wiekowe:</h3>";
-
-      options.forEach(opt => {
-        const label = document.createElement("label");
-        label.style.display = "block";
-        label.style.marginBottom = "6px";
-        const checkbox = document.createElement("input");
-        checkbox.type = "checkbox";
-        checkbox.value = opt;
-        checkbox.style.marginRight = "8px";
-        checkbox.style.accentColor = "#e63946";
-        if (currentValues.includes(opt)) checkbox.checked = true;
-        label.appendChild(checkbox);
-        label.append(opt);
-        box.appendChild(label);
+        input.addEventListener("blur", save);
+        input.addEventListener("keydown", (e) => { if (e.key === "Enter") save(); });
       });
 
-      const btnContainer = document.createElement("div");
-      btnContainer.style.display = "flex";
-      btnContainer.style.justifyContent = "space-between";
-      btnContainer.style.marginTop = "20px";
+      // --- Edycja klubu ---
+      editClubBtn.addEventListener("click", () => {
+        const newVal = prompt("Podaj nazwę klubu:", clubDisplay.textContent);
+        if (newVal && newVal.trim() !== "") {
+          clubDisplay.textContent = newVal;
+          if (window.saveProfileData) saveProfileData({ club: newVal });
+        }
+      });
 
-      const saveBtn = document.createElement("button");
-      saveBtn.textContent = "Zapisz";
-      saveBtn.style.cssText = "padding:8px 18px;border:none;border-radius:8px;background:#e63946;color:#fff;cursor:pointer;flex:1;margin-right:10px;";
+      // --- Kategorie wiekowe ---
+      editCategoriesBtn.addEventListener("click", () => {
+        const options = ["U6","U7","U8","U9","U10","U11","U12","U13","U14","U15","U16","U17","U18","U19"];
+        const current = categoriesDisplay.textContent.split(", ").filter(Boolean);
+        const overlay = document.createElement("div");
+        overlay.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:1000;";
+        const box = document.createElement("div");
+        box.style.cssText = "background:#004d00;padding:25px 35px;border-radius:16px;color:white;font-family:'Montserrat',sans-serif;font-size:16px;";
+        box.innerHTML = "<h3 style='text-align:center;margin-bottom:15px;'>Wybierz kategorie wiekowe:</h3>";
 
-      const cancelBtn = document.createElement("button");
-      cancelBtn.textContent = "Anuluj";
-      cancelBtn.style.cssText = "padding:8px 18px;border:none;border-radius:8px;background:#444;color:#fff;cursor:pointer;flex:1;";
+        options.forEach(opt => {
+          const label = document.createElement("label");
+          label.style.display = "block";
+          label.style.marginBottom = "6px";
+          const cb = document.createElement("input");
+          cb.type = "checkbox";
+          cb.value = opt;
+          cb.style.marginRight = "8px";
+          if (current.includes(opt)) cb.checked = true;
+          label.append(cb, opt);
+          box.append(label);
+        });
 
-      btnContainer.appendChild(saveBtn);
-      btnContainer.appendChild(cancelBtn);
-      box.appendChild(btnContainer);
-      overlay.appendChild(box);
-      document.body.appendChild(overlay);
+        const btns = document.createElement("div");
+        btns.style.cssText = "display:flex;gap:10px;margin-top:20px;";
+        const saveBtn = document.createElement("button");
+        saveBtn.textContent = "Zapisz";
+        saveBtn.style.cssText = "flex:1;padding:8px;border:none;background:#e63946;color:#fff;border-radius:8px;cursor:pointer;";
+        const cancelBtn = document.createElement("button");
+        cancelBtn.textContent = "Anuluj";
+        cancelBtn.style.cssText = "flex:1;padding:8px;border:none;background:#444;color:#fff;border-radius:8px;cursor:pointer;";
+        btns.append(saveBtn, cancelBtn);
+        box.append(btns);
+        overlay.append(box);
+        document.body.append(overlay);
 
-      saveBtn.onclick = () => {
-        const selected = [...box.querySelectorAll("input:checked")].map(cb => cb.value);
-        localStorage.setItem("userCategories", JSON.stringify(selected));
-        categoriesDisplay.textContent = selected.join(", ");
-        document.body.removeChild(overlay);
-      };
-
-      cancelBtn.onclick = () => document.body.removeChild(overlay);
+        saveBtn.onclick = () => {
+          const selected = [...box.querySelectorAll("input:checked")].map(cb => cb.value);
+          categoriesDisplay.textContent = selected.join(", ");
+          document.body.removeChild(overlay);
+          if (window.saveProfileData) saveProfileData({ categories: selected });
+        };
+        cancelBtn.onclick = () => document.body.removeChild(overlay);
+      });
     });
-  });
   </script>
 </body>
 </html>
