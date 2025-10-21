@@ -18,54 +18,69 @@
     </div>
   </header>
 
-  <main class="profile-container">
-    <a href="dashboard.html" class="back-btn">← Powrót</a>
+  <main class="profil-container">
+  <a href="dashboard.html" class="back-btn">← Powrót</a>
+  <img src="profil/avatar.png" alt="Avatar" class="avatar">
 
-    <img src="img/avatar_m.png" alt="Avatar" class="avatar">
+  <h1 id="user-name">
+    <span id="name-display">Adam Nowak</span>
+    <span id="edit-name" class="edit-icon" title="Edytuj imię i nazwisko">✏️</span>
+  </h1>
+  <p class="role">Trener</p>
 
-    <h1 id="user-name">
-      <span id="name-display">Adam Nowak</span>
-      <span id="edit-name" class="edit-icon" title="Edytuj imię i nazwisko">✏️</span>
-    </h1>
-    <p>Trener</p>
+  <section class="stats">
+    <div class="info-box">
+      <h3>Klub</h3>
+      <p>AP Młodziaki</p>
+    </div>
+    <div class="info-box">
+      <h3>Kategorie wiekowe</h3>
+      <p>U9, U11, U12</p>
+    </div>
+  </section>
 
-    <section class="stats">
-      <div class="info-box">
-        <h3>Klub</h3>
-        <p>AP Młodziaki</p>
-      </div>
-      <div class="info-box">
-        <h3>Kategorie wiekowe</h3>
-        <p>U9, U11, U12</p>
-      </div>
-    </section>
+  <section class="stats">
+    <div class="info-box">
+      <h2>16</h2>
+      <p>Rozegrane sparingi</p>
+    </div>
+    <div class="info-box">
+      <h2>4</h2>
+      <p>Zaplanowane sparingi</p>
+    </div>
+  </section>
 
-    <section class="matches">
-      <div class="match-box">
-        <h3>16</h3>
-        <p>Rozegrane sparingi</p>
-      </div>
-      <div class="match-box">
-        <h3>4</h3>
-        <p>Zaplanowane sparingi</p>
-      </div>
-    </section>
+  <section class="recent-matches">
+    <h3>Ostatnie sparingi</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Data</th>
+          <th>Kategoria</th>
+          <th>Mecz</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>13.04.2024</td>
+          <td>U11</td>
+          <td>AP Młodziaki vs UKS Wilanów</td>
+        </tr>
+        <tr>
+          <td>06.04.2024</td>
+          <td>U9</td>
+          <td>FC Talent vs AP Młodziaki</td>
+        </tr>
+        <tr>
+          <td>24.03.2024</td>
+          <td>U12</td>
+          <td>AP Młodziaki vs MKS Delta</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+</main>
 
-    <section class="recent-matches">
-      <h3>Ostatnie sparingi</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>Data</th>
-            <th>Kategoria</th>
-            <th>Mecz</th>
-          </tr>
-        </thead>
-        <tbody id="matches-list">
-        </tbody>
-      </table>
-    </section>
-  </main>
 
   <script>
   // --- Edycja imienia i nazwiska ---
