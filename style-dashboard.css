@@ -106,3 +106,13 @@ main {
     background: rgba(255, 255, 255, 1);
     transform: scale(1.05);
 }
+.logout-tile {
+    background-color: #d9534f;
+    color: white;
+    font-weight: 600;
+}
+
+.logout-tile:hover {
+    background-color: #c9302c;
+    transform: scale(1.05);
+}
