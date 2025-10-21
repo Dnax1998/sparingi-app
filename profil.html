@@ -129,16 +129,89 @@
     if (savedValue) displayEl.textContent = savedValue;
 
     editIcon.addEventListener("click", () => {
-      const newValue = prompt("Wpisz nową wartość:", displayEl.textContent);
-      if (newValue !== null && newValue.trim() !== "") {
-        displayEl.textContent = newValue;
-        localStorage.setItem(storageKey, newValue);
+      // 📌 Jeśli to "categories", otwieramy listę wyboru
+      if (fieldId === "categories") {
+        const options = [
+          "U6","U7","U8","U9","U10","U11","U12",
+          "U13","U14","U15","U16","U17","U18","U19"
+        ];
+
+        // Pobierz zapisane wartości (jeśli są)
+        const currentValues = savedValue ? savedValue.split(", ") : [];
+
+        // Tworzymy okienko HTML
+        const overlay = document.createElement("div");
+        overlay.style.position = "fixed";
+        overlay.style.top = "0";
+        overlay.style.left = "0";
+        overlay.style.width = "100%";
+        overlay.style.height = "100%";
+        overlay.style.background = "rgba(0,0,0,0.5)";
+        overlay.style.display = "flex";
+        overlay.style.alignItems = "center";
+        overlay.style.justifyContent = "center";
+        overlay.style.zIndex = "1000";
+
+        const box = document.createElement("div");
+        box.style.background = "#fff";
+        box.style.padding = "20px";
+        box.style.borderRadius = "12px";
+        box.style.boxShadow = "0 4px 20px rgba(0,0,0,0.3)";
+        box.style.textAlign = "left";
+        box.innerHTML = "<h3>Wybierz kategorie wiekowe:</h3>";
+
+        // Lista checkboxów
+        options.forEach(opt => {
+          const label = document.createElement("label");
+          label.style.display = "block";
+          const checkbox = document.createElement("input");
+          checkbox.type = "checkbox";
+          checkbox.value = opt;
+          if (currentValues.includes(opt)) checkbox.checked = true;
+          label.appendChild(checkbox);
+          label.append(" " + opt);
+          box.appendChild(label);
+        });
+
+        // Przycisk zapisu
+        const saveBtn = document.createElement("button");
+        saveBtn.textContent = "Zapisz";
+        saveBtn.style.marginTop = "15px";
+        saveBtn.style.padding = "8px 16px";
+        saveBtn.style.border = "none";
+        saveBtn.style.borderRadius = "8px";
+        saveBtn.style.background = "#1b4332";
+        saveBtn.style.color = "#fff";
+        saveBtn.style.cursor = "pointer";
+
+        saveBtn.addEventListener("click", () => {
+          const selected = Array.from(box.querySelectorAll("input:checked")).map(cb => cb.value);
+          displayEl.textContent = selected.join(", ");
+          localStorage.setItem(storageKey, selected.join(", "));
+          document.body.removeChild(overlay);
+        });
+
+        box.appendChild(saveBtn);
+        overlay.appendChild(box);
+        document.body.appendChild(overlay);
+      }
+
+      // 📌 Dla pozostałych pól normalny prompt
+      else {
+        const newValue = prompt("Wpisz nową wartość:", displayEl.textContent);
+        if (newValue !== null && newValue.trim() !== "") {
+          displayEl.textContent = newValue;
+          localStorage.setItem(storageKey, newValue);
+        }
       }
     });
   }
 
+  // Aktywuj edycję dla klub i kategorii
   enableEdit("club", "userClub");
   enableEdit("categories", "userCategories");
+</script>
+
 </script>
 
   <!-- 🔒 Zabezpieczenie strony przed wejściem bez logowania -->
