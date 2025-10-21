@@ -140,76 +140,92 @@
         const currentValues = savedValue ? savedValue.split(", ") : [];
 
         // Tworzymy okienko HTML
-        const overlay = document.createElement("div");
-        overlay.style.position = "fixed";
-        overlay.style.top = "0";
-        overlay.style.left = "0";
-        overlay.style.width = "100%";
-        overlay.style.height = "100%";
-        overlay.style.background = "rgba(0,0,0,0.5)";
-        overlay.style.display = "flex";
-        overlay.style.alignItems = "center";
-        overlay.style.justifyContent = "center";
-        overlay.style.zIndex = "1000";
+const overlay = document.createElement("div");
+overlay.style.position = "fixed";
+overlay.style.top = "0";
+overlay.style.left = "0";
+overlay.style.width = "100%";
+overlay.style.height = "100%";
+overlay.style.background = "rgba(0, 0, 0, 0.7)";
+overlay.style.display = "flex";
+overlay.style.alignItems = "center";
+overlay.style.justifyContent = "center";
+overlay.style.zIndex = "1000";
 
-        const box = document.createElement("div");
-        box.style.background = "#fff";
-        box.style.padding = "20px";
-        box.style.borderRadius = "12px";
-        box.style.boxShadow = "0 4px 20px rgba(0,0,0,0.3)";
-        box.style.textAlign = "left";
-        box.innerHTML = "<h3>Wybierz kategorie wiekowe:</h3>";
+const box = document.createElement("div");
+box.style.background = "rgba(0, 50, 0, 0.95)";
+box.style.padding = "25px 35px";
+box.style.borderRadius = "16px";
+box.style.boxShadow = "0 4px 20px rgba(0,0,0,0.6)";
+box.style.textAlign = "left";
+box.style.color = "#fff";
+box.style.fontFamily = "'Montserrat', sans-serif";
+box.style.fontSize = "16px";
+box.innerHTML = "<h3 style='color:#fff; text-align:center; margin-bottom:15px;'>Wybierz kategorie wiekowe:</h3>";
 
-        // Lista checkboxów
-        options.forEach(opt => {
-          const label = document.createElement("label");
-          label.style.display = "block";
-          const checkbox = document.createElement("input");
-          checkbox.type = "checkbox";
-          checkbox.value = opt;
-          if (currentValues.includes(opt)) checkbox.checked = true;
-          label.appendChild(checkbox);
-          label.append(" " + opt);
-          box.appendChild(label);
-        });
+// Lista checkboxów
+options.forEach(opt => {
+  const label = document.createElement("label");
+  label.style.display = "block";
+  label.style.marginBottom = "6px";
+  const checkbox = document.createElement("input");
+  checkbox.type = "checkbox";
+  checkbox.value = opt;
+  checkbox.style.marginRight = "8px";
+  checkbox.style.accentColor = "#e63946"; // czerwone zaznaczenie
+  if (currentValues.includes(opt)) checkbox.checked = true;
+  label.appendChild(checkbox);
+  label.append(opt);
+  box.appendChild(label);
+});
 
-        // Przycisk zapisu
-        const saveBtn = document.createElement("button");
-        saveBtn.textContent = "Zapisz";
-        saveBtn.style.marginTop = "15px";
-        saveBtn.style.padding = "8px 16px";
-        saveBtn.style.border = "none";
-        saveBtn.style.borderRadius = "8px";
-        saveBtn.style.background = "#1b4332";
-        saveBtn.style.color = "#fff";
-        saveBtn.style.cursor = "pointer";
+// Kontener na przyciski
+const buttonContainer = document.createElement("div");
+buttonContainer.style.display = "flex";
+buttonContainer.style.justifyContent = "space-between";
+buttonContainer.style.marginTop = "20px";
 
-        saveBtn.addEventListener("click", () => {
-          const selected = Array.from(box.querySelectorAll("input:checked")).map(cb => cb.value);
-          displayEl.textContent = selected.join(", ");
-          localStorage.setItem(storageKey, selected.join(", "));
-          document.body.removeChild(overlay);
-        });
+// Przycisk ZAPISZ
+const saveBtn = document.createElement("button");
+saveBtn.textContent = "Zapisz";
+saveBtn.style.padding = "8px 18px";
+saveBtn.style.border = "none";
+saveBtn.style.borderRadius = "8px";
+saveBtn.style.background = "#e63946";
+saveBtn.style.color = "#fff";
+saveBtn.style.cursor = "pointer";
+saveBtn.style.flex = "1";
+saveBtn.style.marginRight = "10px";
 
-        box.appendChild(saveBtn);
-        overlay.appendChild(box);
-        document.body.appendChild(overlay);
-      }
+// Przycisk ANULUJ
+const cancelBtn = document.createElement("button");
+cancelBtn.textContent = "Anuluj";
+cancelBtn.style.padding = "8px 18px";
+cancelBtn.style.border = "none";
+cancelBtn.style.borderRadius = "8px";
+cancelBtn.style.background = "#444";
+cancelBtn.style.color = "#fff";
+cancelBtn.style.cursor = "pointer";
+cancelBtn.style.flex = "1";
 
-      // 📌 Dla pozostałych pól normalny prompt
-      else {
-        const newValue = prompt("Wpisz nową wartość:", displayEl.textContent);
-        if (newValue !== null && newValue.trim() !== "") {
-          displayEl.textContent = newValue;
-          localStorage.setItem(storageKey, newValue);
-        }
-      }
-    });
-  }
+// Akcje przycisków
+saveBtn.onclick = () => {
+  const selected = [...box.querySelectorAll("input:checked")].map(cb => cb.value);
+  localStorage.setItem("userCategories", JSON.stringify(selected));
+  document.getElementById("categories-display").textContent = selected.join(", ");
+  document.body.removeChild(overlay);
+};
 
-  // Aktywuj edycję dla klub i kategorii
-  enableEdit("club", "userClub");
-  enableEdit("categories", "userCategories");
+cancelBtn.onclick = () => {
+  document.body.removeChild(overlay);
+};
+
+buttonContainer.appendChild(saveBtn);
+buttonContainer.appendChild(cancelBtn);
+box.appendChild(buttonContainer);
+overlay.appendChild(box);
+document.body.appendChild(overlay);
+
 </script>
 
 </script>
