@@ -134,12 +134,15 @@ if (registerForm) {
   googleRegisterBtn.addEventListener("click", async () => {
     try {
       await auth.signInWithPopup(provider);
-      showMsg("Zarejestrowano przez Google ✅", "success");
+     showMsg("Zarejestrowano przez Google ✅", "success");
 
-      // przekierowanie po rejestracji Google
-      setTimeout(() => {
-        window.location.replace("dashboard.html");
-      }, 800);
+// ✅ dodaj tę linijkę:
+localStorage.setItem('isLoggedIn', 'true');
+
+// przekierowanie po rejestracji Google
+setTimeout(() => {
+    window.location.replace("dashboard.html");
+}, 800);
 
     } catch (err) {
       showMsg("Błąd rejestracji Google: " + err.message, "danger");
