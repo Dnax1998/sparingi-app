@@ -1,3 +1,9 @@
+body {
+  background: url("profil/background.jpg") no-repeat center center fixed;
+  background-size: cover;
+  font-family: "Montserrat", sans-serif;
+}
+
 .edit-icon {
   font-size: 16px;
   color: #e63946;
