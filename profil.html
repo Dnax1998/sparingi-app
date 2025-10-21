@@ -106,5 +106,45 @@
 
   <!-- 🔒 Zabezpieczenie strony przed wejściem bez logowania -->
   <script src="auth-check.js"></script>
+  <script>
+  const nameDisplay = document.getElementById("name-display");
+  const editIcon = document.getElementById("edit-name");
+
+  // Wczytaj zapisane imię z localStorage
+  const savedName = localStorage.getItem("trainerName");
+  if (savedName) {
+    nameDisplay.textContent = savedName;
+  }
+
+  // Po kliknięciu w długopis
+  editIcon.addEventListener("click", () => {
+    const currentName = nameDisplay.textContent;
+    const input = document.createElement("input");
+    input.type = "text";
+    input.value = currentName;
+    input.classList.add("edit-input");
+
+    // Zastąp tekst polem input
+    nameDisplay.replaceWith(input);
+    input.focus();
+
+    // Po wciśnięciu Enter zapisuje
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        const newName = input.value.trim() || currentName;
+        localStorage.setItem("trainerName", newName);
+
+        nameDisplay.textContent = newName;
+        input.replaceWith(nameDisplay);
+      }
+    });
+
+    // Po kliknięciu poza pole — anuluj
+    input.addEventListener("blur", () => {
+      input.replaceWith(nameDisplay);
+    });
+  });
+</script>
+
 </body>
 </html>
