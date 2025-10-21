@@ -116,3 +116,23 @@ main {
     background-color: #c9302c;
     transform: scale(1.05);
 }
+.logout-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 25px;
+}
+
+.logout-tile {
+    background-color: #d9534f;
+    color: white;
+    font-weight: 600;
+    width: 160px;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    transition: 0.3s;
+}
+
+.logout-tile:hover {
+    background-color: #c9302c;
+    transform: scale(1.05);
+}
