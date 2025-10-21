@@ -29,15 +29,17 @@
   <p class="role">Trener</p>
 
   <section class="stats">
-    <div class="info-box">
-      <h3>Klub</h3>
-      <p>AP Młodziaki</p>
-    </div>
-    <div class="info-box">
-      <h3>Kategorie wiekowe</h3>
-      <p>U9, U11, U12</p>
-    </div>
-  </section>
+  <div class="info-box">
+    <h3>Klub</h3>
+    <p id="club-display">AP Młodziaki</p>
+    <span id="edit-club" class="edit-icon" title="Edytuj klub">✏️</span>
+  </div>
+  <div class="info-box">
+    <h3>Kategorie wiekowe</h3>
+    <p id="categories-display">U9, U11, U12</p>
+    <span id="edit-categories" class="edit-icon" title="Edytuj kategorie wiekowe">✏️</span>
+  </div>
+</section>
 
   <section class="stats">
     <div class="info-box">
@@ -159,6 +161,27 @@
       input.replaceWith(nameDisplay);
     });
   });
+</script>
+
+  function enableEdit(fieldId, storageKey) {
+    const displayEl = document.getElementById(fieldId + "-display");
+    const editIcon = document.getElementById("edit-" + fieldId);
+
+    const savedValue = localStorage.getItem(storageKey);
+    if (savedValue) displayEl.textContent = savedValue;
+
+    editIcon.addEventListener("click", () => {
+      const newValue = prompt("Wpisz nową wartość:", displayEl.textContent);
+      if (newValue !== null && newValue.trim() !== "") {
+        displayEl.textContent = newValue;
+        localStorage.setItem(storageKey, newValue);
+      }
+    });
+  }
+
+  enableEdit("name", "userName");
+  enableEdit("club", "userClub");
+  enableEdit("categories", "userCategories");
 </script>
 
 </body>
