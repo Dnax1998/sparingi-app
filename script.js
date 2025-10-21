@@ -63,13 +63,17 @@ console.log("✅ Firebase connected!");
     const password = document.getElementById("loginPassword").value;
 
     try {
-      await auth.signInWithEmailAndPassword(email, password);
-      showMsg("Zalogowano pomyślnie ✅", "success");
-      
-      // przekierowanie po zalogowaniu
-      setTimeout(() => {
-        window.location.replace("dashboard.html");
-      }, 800);
+await auth.signInWithEmailAndPassword(email, password);
+showMsg("Zalogowano pomyślnie ✅", "success");
+
+// ✅ zapisz informację o zalogowaniu
+localStorage.setItem('isLoggedIn', 'true');
+
+// przekierowanie po zalogowaniu
+setTimeout(() => {
+  window.location.replace("dashboard.html");
+}, 800);
+
       
     } catch (err) {
       showMsg("Błąd logowania: " + err.message, "danger");
