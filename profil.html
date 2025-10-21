@@ -190,6 +190,49 @@
       }
 
       // 🔄 zmiana avatara
+      // ✏️ edycja imienia i nazwiska
+const nameDisplay = document.getElementById("user-name");
+const nameEditIcon = document.createElement("span");
+nameEditIcon.textContent = "✏️";
+nameEditIcon.classList.add("edit-icon");
+nameDisplay.insertAdjacentElement("afterend", nameEditIcon);
+
+nameEditIcon.addEventListener("click", () => {
+  const currentName = nameDisplay.textContent.trim();
+  const input = document.createElement("input");
+  input.type = "text";
+  input.value = currentName;
+  input.style.fontSize = "24px";
+  input.style.textAlign = "center";
+  input.style.fontWeight = "700";
+  input.style.borderRadius = "8px";
+  input.style.padding = "4px 8px";
+  input.style.border = "none";
+  input.style.outline = "none";
+  input.style.background = "#fff";
+  input.style.color = "#000";
+  nameDisplay.replaceWith(input);
+  input.focus();
+
+  const saveChange = async () => {
+    const newName = input.value.trim() || currentName;
+    const newSpan = document.createElement("h1");
+    newSpan.id = "user-name";
+    newSpan.textContent = newName;
+    newSpan.style.fontSize = "28px";
+    newSpan.style.fontWeight = "700";
+    input.replaceWith(newSpan);
+    newSpan.insertAdjacentElement("afterend", nameEditIcon);
+    await updateDoc(doc(db, "users", user.uid), { name: newName });
+  };
+
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") saveChange();
+  });
+
+  input.addEventListener("blur", saveChange);
+});
+
       changeBtn.addEventListener("click", async () => {
         const current = avatarEl.src.split("/").pop();
         const next = avatars[(avatars.indexOf(current) + 1) % avatars.length];
