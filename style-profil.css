@@ -1,132 +1,267 @@
+/* ===== OGÓLNY STYL STRONY ===== */
 body {
-  background: url("profil/background.jpg") no-repeat center center fixed;
-  background-size: cover;
-  font-family: "Montserrat", sans-serif;
-  color: #fff;
-  text-align: center;
-  min-height: 100vh;
   margin: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  font-family: "Montserrat", sans-serif;
+  background: url("background.jpg") no-repeat center center fixed;
+  background-size: cover;
+  color: white;
+  text-align: center;
 }
 
-body::before {
-  content: "";
+/* ===== LOGO ===== */
+.logo img {
+  vertical-align: middle;
+}
+
+.logo span {
+  font-weight: 700;
+  font-size: 18px;
+  margin-left: 10px;
+}
+
+/* ===== KONTENER PROFILU ===== */
+.profil-container {
+  max-width: 900px;
+  margin: 100px auto 60px;
+  background: rgba(0, 0, 0, 0.45);
+  border-radius: 25px;
+  padding: 40px;
+  box-shadow: 0 0 25px rgba(0, 0, 0, 0.4);
+}
+
+/* ===== POWRÓT ===== */
+.back-btn {
+  display: inline-block;
+  color: #00c853;
+  text-decoration: none;
+  font-weight: 600;
+  margin-bottom: 20px;
+  transition: 0.3s ease;
+}
+
+.back-btn:hover {
+  text-decoration: underline;
+}
+
+/* ===== AVATAR ===== */
+.avatar-container {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 15px;
+}
+
+.avatar {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  border: 3px solid #00c853;
+  object-fit: cover;
+}
+
+.change-avatar-btn {
+  display: block;
+  margin: 8px auto 0;
+  background: none;
+  color: #00c853;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  transition: 0.3s ease;
+}
+
+.change-avatar-btn:hover {
+  text-decoration: underline;
+}
+
+/* ===== IMIĘ ===== */
+#user-name {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 5px 0;
+}
+
+.role {
+  font-size: 16px;
+  color: #cccccc;
+}
+
+/* ===== BOXY KLUB / KATEGORIE ===== */
+.stats {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 40px;
+  margin: 40px 0;
+}
+
+.info-box {
+  background: rgba(0, 0, 0, 0.4);
+  padding: 25px 40px;
+  border-radius: 20px;
+  min-width: 200px;
+  position: relative;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.info-box h3 {
+  font-size: 16px;
+  margin-bottom: 10px;
+  font-weight: 600;
+  color: #9ff7c2;
+}
+
+.info-box p {
+  font-size: 15px;
+  margin: 0;
+}
+
+.edit-icon {
+  cursor: pointer;
+  font-size: 18px;
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  opacity: 0.8;
+  transition: 0.2s ease;
+}
+
+.edit-icon:hover {
+  opacity: 1;
+  transform: scale(1.15);
+}
+
+/* ===== BOXY SPARINGÓW ===== */
+.match-stats {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  margin-bottom: 40px;
+}
+
+.match-box {
+  background: rgba(0, 0, 0, 0.4);
+  color: white;
+  border-radius: 20px;
+  padding: 20px 40px;
+  text-align: center;
+  min-width: 200px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s ease;
+}
+
+.match-box:hover {
+  transform: translateY(-4px);
+}
+
+.match-box h4 {
+  font-size: 36px;
+  margin: 0;
+}
+
+.match-box p {
+  margin: 5px 0 0;
+  font-size: 15px;
+  color: #9ff7c2;
+}
+
+/* ===== TABELA OSTATNICH SPARINGÓW ===== */
+.recent-matches {
+  margin-top: 30px;
+}
+
+.recent-matches h3 {
+  margin-bottom: 15px;
+  color: #9ff7c2;
+}
+
+.recent-matches table {
+  width: 100%;
+  border-collapse: collapse;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 15px;
+  overflow: hidden;
+}
+
+.recent-matches th, .recent-matches td {
+  padding: 12px;
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.recent-matches tr:last-child td {
+  border-bottom: none;
+}
+
+/* ===== MODAL (KATEGORIE WIEKOWE) ===== */
+.modal {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.4);
-  z-index: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
 }
 
-main {
-  position: relative;
-  z-index: 1;
-  max-width: 900px;
-  width: 100%;
-  padding: 20px;
+.modal-content {
+  background: #f8f9fa;
+  border-radius: 15px;
+  padding: 25px 30px;
+  width: 320px;
+  box-shadow: 0 0 25px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  animation: fadeIn 0.3s ease;
 }
 
-.avatar {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  margin-top: 10px;
+.modal-content h3 {
+  color: #0b3b1a;
+  font-weight: 700;
+  margin-bottom: 15px;
 }
 
-h1 {
-  font-size: 2rem;
-  margin: 10px 0;
-}
-
-.role {
+#category-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 15px;
+  text-align: left;
   margin-bottom: 20px;
 }
 
-.stats {
+#category-options label {
+  font-size: 15px;
+  color: #222;
   display: flex;
-  justify-content: center;
-  gap: 20px;
-  flex-wrap: wrap;
-  margin-bottom: 30px;
+  align-items: center;
+  gap: 8px;
 }
 
-.info-box {
-  background: rgba(0, 0, 0, 0.35);
-  padding: 20px 40px;
-  border-radius: 15px;
-  min-width: 200px;
-}
-
-.info-box h3 {
-  margin: 0;
-  font-weight: 600;
-}
-
-.recent-matches {
-  background: rgba(0, 0, 0, 0.4);
-  padding: 20px;
-  border-radius: 20px;
-}
-
-.recent-matches table {
-  width: 100%;
-  margin-top: 10px;
-  border-collapse: collapse;
-  color: #fff;
-}
-
-.recent-matches th, .recent-matches td {
-  padding: 10px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.edit-icon {
-  font-size: 16px;
-  color: #e63946;
-  margin-left: 8px;
+#category-options input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
   cursor: pointer;
-  transition: transform 0.2s;
 }
 
-.edit-icon:hover {
-  transform: scale(1.2);
-}
-
-.back-btn {
-  color: #fff;
-  text-decoration: none;
-  font-weight: bold;
-  display: inline-block;
-  margin-top: 10px;
-}
-/* --- Nagłówek jak na dashboardzie --- */
-.navbar {
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  display: flex;
-  align-items: center;
-  z-index: 100;
-}
-
-.logo-container {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.logo-container img {
-  height: 50px;
-  width: auto;
-}
-
-.logo-text {
-  font-size: 20px;
-  font-weight: 700;
+.save-btn {
+  background: #28a745;
   color: white;
-  font-family: "Montserrat", sans-serif;
+  font-weight: 600;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.save-btn:hover {
+  background: #218838;
+  transform: scale(1.03);
+}
+
+/* ===== ANIMACJA ===== */
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
 }
