@@ -93,13 +93,16 @@ if (registerForm) {
     }
 
     try {
-      await auth.createUserWithEmailAndPassword(email, password);
-      showMsg("Zarejestrowano pomyślnie ✅", "success");
+    await auth.createUserWithEmailAndPassword(email, password);
+showMsg("Zarejestrowano pomyślnie ✅", "success");
 
-      // przekierowanie po udanej rejestracji
-      setTimeout(() => {
-        window.location.replace("dashboard.html");
-      }, 800);
+// ✅ zapisz informację o zalogowaniu
+localStorage.setItem('isLoggedIn', 'true');
+
+// przekierowanie po udanej rejestracji
+setTimeout(() => {
+  window.location.replace("dashboard.html");
+}, 800);
 
     } catch (err) {
       showMsg("Błąd rejestracji: " + err.message, "danger");
