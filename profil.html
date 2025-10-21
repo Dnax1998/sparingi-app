@@ -1,20 +1,19 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Profil – ZgranyTrener.pl</title>
-  <link rel="stylesheet" href="style-profil.css">
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style-profil.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet" />
   <script type="module" src="https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js"></script>
   <script type="module" src="https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js"></script>
   <script type="module" src="https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js"></script>
 </head>
 <body>
-
   <header>
     <div class="logo" style="position: absolute; top: 10px; left: 20px; display: flex; align-items: center;">
-      <img src="logo.png" alt="Logo ZgranyTrener.pl" height="50">
+      <img src="logo.png" alt="Logo ZgranyTrener.pl" height="50" />
       <span style="color: white; font-weight: 700; font-size: 18px; margin-left: 10px;">ZgranyTrener.pl</span>
     </div>
   </header>
@@ -23,7 +22,7 @@
     <a href="dashboard.html" class="back-btn">← Powrót</a>
 
     <div class="avatar-container">
-      <img id="user-avatar" src="avatar1.png" alt="Avatar" class="avatar">
+      <img id="user-avatar" src="avatar1.png" alt="Avatar" class="avatar" />
       <button id="change-avatar" class="change-avatar-btn">Zmień avatar</button>
     </div>
 
@@ -65,20 +64,90 @@
     </section>
   </main>
 
+  <!-- Modal do wyboru kategorii -->
+  <div id="category-modal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <h3>Wybierz kategorie wiekowe</h3>
+      <div id="category-options"></div>
+      <button id="save-categories" class="save-btn">Zapisz</button>
+    </div>
+  </div>
+
+  <style>
+    .modal {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+    }
+    .modal-content {
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      width: 300px;
+      text-align: center;
+    }
+    .modal-content h3 {
+      margin-bottom: 10px;
+    }
+    .modal-content label {
+      display: block;
+      text-align: left;
+    }
+    .save-btn {
+      background: #1e7e34;
+      color: white;
+      border: none;
+      padding: 8px 14px;
+      margin-top: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .save-btn:hover {
+      background: #28a745;
+    }
+    .match-stats {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      margin-top: 20px;
+    }
+    .match-box {
+      background: rgba(0,0,0,0.3);
+      color: white;
+      border-radius: 15px;
+      padding: 20px 40px;
+      text-align: center;
+      min-width: 200px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+    .match-box h4 {
+      font-size: 32px;
+      margin: 0;
+    }
+    .match-box p {
+      margin: 5px 0 0;
+    }
+  </style>
+
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
     import { getFirestore, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
-    // 🔥 KONFIGURACJA FIREBASE
-   const firebaseConfig = {
-  apiKey: "AIzaSyBXwR3VojWtQLA6FsXj2pVQsSTWNNAUhb0",
-  authDomain: "sparingi-app.firebaseapp.com",
-  projectId: "sparingi-app",
-  storageBucket: "sparingi-app.firebasestorage.app",
-  messagingSenderId: "293859421755",
-  appId: "1:293859421755:web:e98887fdc5fb4a79aef61e"
-};
+    // 🔥 Twoja konfiguracja Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyBXwR3VojWtQLA6FsXj2pVQsSTWNNAUhb0",
+      authDomain: "sparingi-app.firebaseapp.com",
+      projectId: "sparingi-app",
+      storageBucket: "sparingi-app.firebasestorage.app",
+      messagingSenderId: "293859421755",
+      appId: "1:293859421755:web:e98887fdc5fb4a79aef61e"
+    };
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
@@ -92,9 +161,14 @@
     const categoriesDisplay = document.getElementById("categories-display");
     const categoriesEdit = document.getElementById("edit-categories");
 
+    const modal = document.getElementById("category-modal");
+    const optionsContainer = document.getElementById("category-options");
+    const saveBtn = document.getElementById("save-categories");
+
     const avatars = ["avatar1.png", "avatar2.png"];
 
-    // 🔐 Po zalogowaniu ładujemy dane z Firestore
+    const allCategories = ["U6","U7","U8","U9","U10","U11","U12","U13","U14","U15","U16","U17","U18","U19"];
+
     onAuthStateChanged(auth, async (user) => {
       if (!user) {
         window.location.href = "index.html";
@@ -115,7 +189,7 @@
         await setDoc(userRef, { club: "", categories: [], avatar: "avatar1.png" });
       }
 
-      // 🔄 Zmieniaj avatar
+      // 🔄 zmiana avatara
       changeBtn.addEventListener("click", async () => {
         const current = avatarEl.src.split("/").pop();
         const next = avatars[(avatars.indexOf(current) + 1) % avatars.length];
@@ -123,7 +197,7 @@
         await updateDoc(userRef, { avatar: next });
       });
 
-      // ✏️ Edytuj klub
+      // ✏️ edycja klubu
       clubEdit.addEventListener("click", async () => {
         const newClub = prompt("Wpisz nazwę klubu:", clubDisplay.textContent);
         if (newClub) {
@@ -132,19 +206,34 @@
         }
       });
 
-      // 🧒 Edytuj kategorie wiekowe
+      // 🧒 wybór kategorii (popup)
       categoriesEdit.addEventListener("click", async () => {
-        const all = ["U6", "U7", "U8", "U9", "U10", "U11", "U12", "U13", "U14", "U15", "U16", "U17", "U18", "U19"];
-        const current = categoriesDisplay.textContent.split(",").map(c => c.trim());
-        const selected = prompt(`Wybierz kategorie (oddziel przecinkami):\n${all.join(", ")}`, current.join(", "));
-        if (selected !== null) {
-          const categories = selected.split(",").map(c => c.trim()).filter(Boolean);
-          categoriesDisplay.textContent = categories.join(", ");
-          await updateDoc(userRef, { categories });
-        }
+        modal.style.display = "flex";
+        optionsContainer.innerHTML = "";
+        allCategories.forEach(cat => {
+          const div = document.createElement("label");
+          const input = document.createElement("input");
+          input.type = "checkbox";
+          input.value = cat;
+          if (categoriesDisplay.textContent.includes(cat)) input.checked = true;
+          div.appendChild(input);
+          div.appendChild(document.createTextNode(" " + cat));
+          optionsContainer.appendChild(div);
+        });
+      });
+
+      saveBtn.addEventListener("click", async () => {
+        const checked = [...optionsContainer.querySelectorAll("input:checked")].map(i => i.value);
+        categoriesDisplay.textContent = checked.join(", ") || "Brak";
+        modal.style.display = "none";
+        await updateDoc(userRef, { categories: checked });
+      });
+
+      // zamykanie modala po kliknięciu w tło
+      modal.addEventListener("click", (e) => {
+        if (e.target === modal) modal.style.display = "none";
       });
     });
   </script>
-
 </body>
 </html>
