@@ -117,17 +117,21 @@ if (registerForm) {
     try {
       await auth.signInWithPopup(provider);
       showMsg("Zalogowano przez Google ✅", "success");
-      
-      // przekierowanie po logowaniu Google
+
+      // ✅ zapisz informację o zalogowaniu
+      localStorage.setItem('isLoggedIn', 'true');
+
+      // przekierowanie po zalogowaniu
       setTimeout(() => {
         window.location.replace("dashboard.html");
       }, 800);
-      
+
     } catch (err) {
       showMsg("Błąd logowania Google: " + err.message, "danger");
     }
   });
 }
+
 
 
   if (googleRegisterBtn) {
