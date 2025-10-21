@@ -3,54 +3,53 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Profil - ZgranyTrener.pl</title>
-  <link rel="stylesheet" href="../style.css">
-  <link rel="stylesheet" href="../style-profil.css">
+  <title>Profil – ZgranyTrener.pl</title>
+  <link rel="stylesheet" href="style-profil.css">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+  <script type="module" src="https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js"></script>
+  <script type="module" src="https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js"></script>
+  <script type="module" src="https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js"></script>
 </head>
-
 <body>
 
-  <header class="navbar">
-  <div class="logo-container">
-<img src="logo.png" alt="Logo ZgranyTrener.pl" height="50">
-
-
-    <span class="logo-text">ZgranyTrener.pl</span>
-  </div>
-</header>
-
+  <header>
+    <div class="logo" style="position: absolute; top: 10px; left: 20px; display: flex; align-items: center;">
+      <img src="logo.png" alt="Logo ZgranyTrener.pl" height="50">
+      <span style="color: white; font-weight: 700; font-size: 18px; margin-left: 10px;">ZgranyTrener.pl</span>
+    </div>
+  </header>
 
   <main class="profil-container">
     <a href="dashboard.html" class="back-btn">← Powrót</a>
-    <img src="profil/avatar.png" alt="Avatar" class="avatar">
 
-    <h1 id="user-name">
-      <span id="name-display">Adam Nowak</span>
-      <span id="edit-name" class="edit-icon" title="Edytuj imię i nazwisko">✏️</span>
-    </h1>
+    <div class="avatar-container">
+      <img id="user-avatar" src="avatar1.png" alt="Avatar" class="avatar">
+      <button id="change-avatar" class="change-avatar-btn">Zmień avatar</button>
+    </div>
+
+    <h1 id="user-name">Użytkownik</h1>
     <p class="role">Trener</p>
 
     <section class="stats">
       <div class="info-box">
         <h3>Klub</h3>
-        <p id="club-display">AP Młodziaki</p>
-        <span id="edit-club" class="edit-icon" title="Edytuj klub">✏️</span>
+        <p id="club-display">Brak</p>
+        <span id="edit-club" class="edit-icon">✏️</span>
       </div>
       <div class="info-box">
         <h3>Kategorie wiekowe</h3>
-        <p id="categories-display">U9, U11, U12</p>
-        <span id="edit-categories" class="edit-icon" title="Edytuj kategorie wiekowe">✏️</span>
+        <p id="categories-display">Brak</p>
+        <span id="edit-categories" class="edit-icon">✏️</span>
       </div>
     </section>
 
-    <section class="stats">
-      <div class="info-box">
-        <h2>16</h2>
+    <section class="match-stats">
+      <div class="match-box">
+        <h4>16</h4>
         <p>Rozegrane sparingi</p>
       </div>
-      <div class="info-box">
-        <h2>4</h2>
+      <div class="match-box">
+        <h4>4</h4>
         <p>Zaplanowane sparingi</p>
       </div>
     </section>
@@ -58,44 +57,21 @@
     <section class="recent-matches">
       <h3>Ostatnie sparingi</h3>
       <table>
-        <thead>
-          <tr>
-            <th>Data</th>
-            <th>Kategoria</th>
-            <th>Mecz</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>13.04.2024</td>
-            <td>U11</td>
-            <td>AP Młodziaki vs UKS Wilanów</td>
-          </tr>
-          <tr>
-            <td>06.04.2024</td>
-            <td>U9</td>
-            <td>FC Talent vs AP Młodziaki</td>
-          </tr>
-          <tr>
-            <td>24.03.2024</td>
-            <td>U12</td>
-            <td>AP Młodziaki vs MKS Delta</td>
-          </tr>
-        </tbody>
+        <tr><th>Data</th><th>Kategoria</th><th>Mecz</th></tr>
+        <tr><td>13.04.2024</td><td>U11</td><td>AP Młodziaki vs UKS Wilanów</td></tr>
+        <tr><td>06.04.2024</td><td>U9</td><td>FC Talent vs AP Młodziaki</td></tr>
+        <tr><td>24.03.2024</td><td>U12</td><td>AP Młodziaki vs MKS Delta</td></tr>
       </table>
     </section>
   </main>
 
-  <!-- 🔒 Zabezpieczenie strony przed wejściem bez logowania -->
-  <script src="auth-check.js"></script>
-
-  <!-- 🚀 Połączenie z Firebase -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
-    const firebaseConfig = {
+    // 🔥 KONFIGURACJA FIREBASE
+   const firebaseConfig = {
   apiKey: "AIzaSyBXwR3VojWtQLA6FsXj2pVQsSTWNNAUhb0",
   authDomain: "sparingi-app.firebaseapp.com",
   projectId: "sparingi-app",
@@ -108,117 +84,67 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // 🔒 Sprawdzenie logowania
+    const userName = document.getElementById("user-name");
+    const avatarEl = document.getElementById("user-avatar");
+    const changeBtn = document.getElementById("change-avatar");
+    const clubDisplay = document.getElementById("club-display");
+    const clubEdit = document.getElementById("edit-club");
+    const categoriesDisplay = document.getElementById("categories-display");
+    const categoriesEdit = document.getElementById("edit-categories");
+
+    const avatars = ["avatar1.png", "avatar2.png"];
+
+    // 🔐 Po zalogowaniu ładujemy dane z Firestore
     onAuthStateChanged(auth, async (user) => {
       if (!user) {
-        window.location.href = "login.html";
+        window.location.href = "index.html";
         return;
       }
+
+      userName.textContent = user.displayName || "Trener";
 
       const userRef = doc(db, "users", user.uid);
       const docSnap = await getDoc(userRef);
 
       if (docSnap.exists()) {
         const data = docSnap.data();
-        document.getElementById("name-display").textContent = data.name || user.displayName || "Brak";
-        document.getElementById("club-display").textContent = data.club || "Brak";
-        document.getElementById("categories-display").textContent = (data.categories || []).join(", ");
+        clubDisplay.textContent = data.club || "Brak";
+        categoriesDisplay.textContent = data.categories?.join(", ") || "Brak";
+        avatarEl.src = data.avatar || "avatar1.png";
       } else {
-        await setDoc(userRef, { name: user.displayName || "", club: "", categories: [] });
+        await setDoc(userRef, { club: "", categories: [], avatar: "avatar1.png" });
       }
 
-      // Funkcja zapisu
-      window.saveProfileData = async (newData) => {
-        await setDoc(userRef, newData, { merge: true });
-      };
-    });
-  </script>
-
-  <!-- ✏️ Skrypt do edycji profilu -->
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const nameDisplay = document.getElementById("name-display");
-      const editNameBtn = document.getElementById("edit-name");
-      const clubDisplay = document.getElementById("club-display");
-      const editClubBtn = document.getElementById("edit-club");
-      const categoriesDisplay = document.getElementById("categories-display");
-      const editCategoriesBtn = document.getElementById("edit-categories");
-
-      // --- Edycja imienia ---
-      editNameBtn.addEventListener("click", () => {
-        const input = document.createElement("input");
-        input.type = "text";
-        input.value = nameDisplay.textContent;
-        nameDisplay.replaceWith(input);
-        input.focus();
-
-        const save = async () => {
-          const newName = input.value.trim() || "Bez imienia";
-          const span = document.createElement("span");
-          span.id = "name-display";
-          span.textContent = newName;
-          input.replaceWith(span);
-          if (window.saveProfileData) saveProfileData({ name: newName });
-        };
-
-        input.addEventListener("blur", save);
-        input.addEventListener("keydown", (e) => { if (e.key === "Enter") save(); });
+      // 🔄 Zmieniaj avatar
+      changeBtn.addEventListener("click", async () => {
+        const current = avatarEl.src.split("/").pop();
+        const next = avatars[(avatars.indexOf(current) + 1) % avatars.length];
+        avatarEl.src = next;
+        await updateDoc(userRef, { avatar: next });
       });
 
-      // --- Edycja klubu ---
-      editClubBtn.addEventListener("click", () => {
-        const newVal = prompt("Podaj nazwę klubu:", clubDisplay.textContent);
-        if (newVal && newVal.trim() !== "") {
-          clubDisplay.textContent = newVal;
-          if (window.saveProfileData) saveProfileData({ club: newVal });
+      // ✏️ Edytuj klub
+      clubEdit.addEventListener("click", async () => {
+        const newClub = prompt("Wpisz nazwę klubu:", clubDisplay.textContent);
+        if (newClub) {
+          clubDisplay.textContent = newClub;
+          await updateDoc(userRef, { club: newClub });
         }
       });
 
-      // --- Kategorie wiekowe ---
-      editCategoriesBtn.addEventListener("click", () => {
-        const options = ["U6","U7","U8","U9","U10","U11","U12","U13","U14","U15","U16","U17","U18","U19"];
-        const current = categoriesDisplay.textContent.split(", ").filter(Boolean);
-        const overlay = document.createElement("div");
-        overlay.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:1000;";
-        const box = document.createElement("div");
-        box.style.cssText = "background:#004d00;padding:25px 35px;border-radius:16px;color:white;font-family:'Montserrat',sans-serif;font-size:16px;";
-        box.innerHTML = "<h3 style='text-align:center;margin-bottom:15px;'>Wybierz kategorie wiekowe:</h3>";
-
-        options.forEach(opt => {
-          const label = document.createElement("label");
-          label.style.display = "block";
-          label.style.marginBottom = "6px";
-          const cb = document.createElement("input");
-          cb.type = "checkbox";
-          cb.value = opt;
-          cb.style.marginRight = "8px";
-          if (current.includes(opt)) cb.checked = true;
-          label.append(cb, opt);
-          box.append(label);
-        });
-
-        const btns = document.createElement("div");
-        btns.style.cssText = "display:flex;gap:10px;margin-top:20px;";
-        const saveBtn = document.createElement("button");
-        saveBtn.textContent = "Zapisz";
-        saveBtn.style.cssText = "flex:1;padding:8px;border:none;background:#e63946;color:#fff;border-radius:8px;cursor:pointer;";
-        const cancelBtn = document.createElement("button");
-        cancelBtn.textContent = "Anuluj";
-        cancelBtn.style.cssText = "flex:1;padding:8px;border:none;background:#444;color:#fff;border-radius:8px;cursor:pointer;";
-        btns.append(saveBtn, cancelBtn);
-        box.append(btns);
-        overlay.append(box);
-        document.body.append(overlay);
-
-        saveBtn.onclick = () => {
-          const selected = [...box.querySelectorAll("input:checked")].map(cb => cb.value);
-          categoriesDisplay.textContent = selected.join(", ");
-          document.body.removeChild(overlay);
-          if (window.saveProfileData) saveProfileData({ categories: selected });
-        };
-        cancelBtn.onclick = () => document.body.removeChild(overlay);
+      // 🧒 Edytuj kategorie wiekowe
+      categoriesEdit.addEventListener("click", async () => {
+        const all = ["U6", "U7", "U8", "U9", "U10", "U11", "U12", "U13", "U14", "U15", "U16", "U17", "U18", "U19"];
+        const current = categoriesDisplay.textContent.split(",").map(c => c.trim());
+        const selected = prompt(`Wybierz kategorie (oddziel przecinkami):\n${all.join(", ")}`, current.join(", "));
+        if (selected !== null) {
+          const categories = selected.split(",").map(c => c.trim()).filter(Boolean);
+          categoriesDisplay.textContent = categories.join(", ");
+          await updateDoc(userRef, { categories });
+        }
       });
     });
   </script>
+
 </body>
 </html>
