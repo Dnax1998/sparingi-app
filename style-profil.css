@@ -2,8 +2,32 @@ body {
   background: url("profil/background.jpg") no-repeat center center fixed;
   background-size: cover;
   font-family: "Montserrat", sans-serif;
+  color: white;
+  text-align: center;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
 }
 
+/* przyciemniająca nakładka na tło */
+body::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.45);
+  z-index: 0;
+}
+
+main, header, .profil-container, .stats {
+  position: relative;
+  z-index: 1;
+}
 .edit-icon {
   font-size: 16px;
   color: #e63946;
