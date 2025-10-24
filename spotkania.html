@@ -257,6 +257,20 @@
       const matchesList = document.getElementById("matches-list");
       const teamInput = document.getElementById("team");
       const categorySelect = document.getElementById("category");
+      const matchTypeSelect = document.getElementById("matchType");
+      const locationInput = document.getElementById("location");
+
+      // 🔁 Blokowanie pola adresu, jeśli wyjazdowy
+      matchTypeSelect.addEventListener("change", () => {
+        if (matchTypeSelect.value === "Wyjazdowy") {
+          locationInput.value = "";
+          locationInput.setAttribute("readonly", true);
+          locationInput.placeholder = "Adres tylko dla meczów domowych";
+        } else {
+          locationInput.removeAttribute("readonly");
+          locationInput.placeholder = "Adres lub stadion";
+        }
+      });
 
       async function loadMatches() {
         matchesList.innerHTML = "<p>Ładowanie sparingów...</p>";
@@ -275,7 +289,7 @@
             <strong>${data.team || "Nieznany klub"}</strong> (${data.category})<br>
             🏠 ${data.matchType || "Nie podano"}<br>
             📅 ${data.date}<br>
-            📍 ${data.location}<br>
+            ${data.location ? "📍 " + data.location + "<br>" : ""}
             <small>${data.notes || ""}</small>
           `;
           matchesList.appendChild(item);
@@ -329,14 +343,13 @@
           teamInput.value = "Błąd ładowania danych";
         }
 
-        // 💾 Zapis sparingu
         form.addEventListener("submit", async (e) => {
           e.preventDefault();
           const team = teamInput.value;
           const category = categorySelect.value;
           const date = document.getElementById("date").value;
-          const matchType = document.getElementById("matchType").value;
-          const location = document.getElementById("location").value;
+          const matchType = matchTypeSelect.value;
+          const location = locationInput.value;
           const notes = document.getElementById("notes").value;
 
           await addDoc(collection(db, "sparingi"), {
