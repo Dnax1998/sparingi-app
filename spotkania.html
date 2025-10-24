@@ -204,7 +204,6 @@
           <h2>Ogólne sparingi</h2>
           <p>Lista wszystkich sparingów dodanych przez trenerów:</p>
 
-          <!-- 🔍 WYSZUKIWARKA -->
           <div class="search-bar">
             <input type="text" id="searchTeam" placeholder="Nazwa drużyny..." />
             <select id="searchCategory">
@@ -310,7 +309,8 @@
         orderBy,
         query,
         doc,
-        getDoc
+        getDoc,
+        deleteDoc
       } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
       const firebaseConfig = {
@@ -354,9 +354,26 @@
         }
       });
 
+      // 🧹 Usuwanie przeszłych meczów
+      async function cleanOldMatches() {
+        const q = query(collection(db, "sparingi"));
+        const snapshot = await getDocs(q);
+        const now = new Date();
+
+        snapshot.forEach(async (docSnap) => {
+          const data = docSnap.data();
+          if (!data.date) return;
+          const matchDate = new Date(`${data.date}T${data.time || "00:00"}`);
+          if (matchDate < now) {
+            await deleteDoc(doc(db, "sparingi", docSnap.id));
+          }
+        });
+      }
+
       let allMatches = [];
 
       async function loadMatches() {
+        await cleanOldMatches(); // 🆕 usuwa przeszłe spotkania
         matchesList.innerHTML = "<p>Ładowanie sparingów...</p>";
         const q = query(collection(db, "sparingi"), orderBy("date", "desc"));
         const snapshot = await getDocs(q);
@@ -488,7 +505,7 @@
           date,
           time,
           matchType,
-          location: matchType === "Wyjazdowy" ? "" : location, // 🆕 adres tylko przy meczach domowych
+          location: matchType === "Wyjazdowy" ? "" : location,
           notes,
           createdAt: new Date()
         });
