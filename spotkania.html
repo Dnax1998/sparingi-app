@@ -87,6 +87,12 @@
         width: 100%;
       }
 
+      input[readonly] {
+        background: rgba(255, 255, 255, 0.1);
+        color: #ccc;
+        cursor: not-allowed;
+      }
+
       textarea {
         resize: none;
         height: 80px;
@@ -181,8 +187,8 @@
           <h1>Umów sparing</h1>
           <form id="match-form">
             <div>
-              <label for="opponent">Przeciwnik</label>
-              <input type="text" id="opponent" placeholder="Nazwa drużyny przeciwnika" required />
+              <label for="team">Twoja drużyna</label>
+              <input type="text" id="team" readonly placeholder="Ładowanie nazwy klubu..." />
             </div>
 
             <div>
@@ -235,7 +241,8 @@
 
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-      import { getFirestore, addDoc, collection, getDocs, orderBy, query } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+      import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+      import { getFirestore, addDoc, collection, getDocs, orderBy, query, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
       const firebaseConfig = {
         apiKey: "AIzaSyBXwR3VojWtQLA6FsXj2pVQsSTWNNAUhb0",
@@ -247,11 +254,13 @@
       };
 
       const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
       const db = getFirestore(app);
 
       const form = document.getElementById("match-form");
       const confirmation = document.getElementById("confirmation");
       const matchesList = document.getElementById("matches-list");
+      const teamInput = document.getElementById("team");
 
       async function loadMatches() {
         matchesList.innerHTML = "<p>Ładowanie sparingów...</p>";
@@ -267,7 +276,7 @@
           const item = document.createElement("div");
           item.classList.add("match-item");
           item.innerHTML = `
-            <strong>${data.opponent}</strong> (${data.category})<br>
+            <strong>${data.team}</strong> (${data.category})<br>
             📅 ${data.date}<br>
             📍 ${data.location}<br>
             <small>${data.notes || ""}</small>
@@ -276,30 +285,43 @@
         });
       }
 
-      form.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const opponent = document.getElementById("opponent").value;
-        const category = document.getElementById("category").value;
-        const date = document.getElementById("date").value;
-        const location = document.getElementById("location").value;
-        const notes = document.getElementById("notes").value;
+      onAuthStateChanged(auth, async (user) => {
+        if (!user) {
+          window.location.href = "index.html";
+        } else {
+          const userDoc = await getDoc(doc(db, "users", user.uid));
+          if (userDoc.exists()) {
+            const userData = userDoc.data();
+            teamInput.value = userData.klub || "Nieznany klub";
+          }
 
-        await addDoc(collection(db, "sparingi"), {
-          opponent,
-          category,
-          date,
-          location,
-          notes,
-          createdAt: new Date()
-        });
+          form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const team = teamInput.value;
+            const category = document.getElementById("category").value;
+            const date = document.getElementById("date").value;
+            const location = document.getElementById("location").value;
+            const notes = document.getElementById("notes").value;
 
-        confirmation.style.display = "block";
-        form.reset();
+            await addDoc(collection(db, "sparingi"), {
+              team,
+              category,
+              date,
+              location,
+              notes,
+              createdAt: new Date()
+            });
+
+            confirmation.style.display = "block";
+            form.reset();
+            teamInput.value = team;
+            await loadMatches();
+            setTimeout(() => (confirmation.style.display = "none"), 3000);
+          });
+        }
+
         await loadMatches();
-        setTimeout(() => (confirmation.style.display = "none"), 3000);
       });
-
-      loadMatches();
     </script>
   </body>
 </html>
