@@ -204,31 +204,6 @@
           <h2>Ogólne sparingi</h2>
           <p>Lista wszystkich sparingów dodanych przez trenerów:</p>
 
-          <!-- 🔍 WYSZUKIWARKA -->
-          <div class="search-bar">
-            <input type="text" id="searchTeam" placeholder="Nazwa drużyny..." />
-            <select id="searchCategory">
-              <option value="">Kategoria</option>
-              <option>U6</option><option>U7</option><option>U8</option><option>U9</option>
-              <option>U10</option><option>U11</option><option>U12</option><option>U13</option>
-              <option>U14</option><option>U15</option><option>U16</option><option>U17</option>
-              <option>U18</option><option>U19</option>
-            </select>
-            <select id="searchLevel">
-              <option value="">Poziom</option>
-              <option>Rekreacja</option>
-              <option>Podstawowy</option>
-              <option>Średniozaawansowany</option>
-              <option>Zaawansowany</option>
-            </select>
-            <input type="date" id="searchDate" />
-            <select id="searchType">
-              <option value="">Typ meczu</option>
-              <option>Domowy</option>
-              <option>Wyjazdowy</option>
-            </select>
-          </div>
-
           <div id="matches-list"></div>
         </div>
 
@@ -342,6 +317,18 @@
       const today = new Date().toISOString().split("T")[0];
       dateInput.min = today;
 
+      // 🏠/🚗 Blokowanie pola adresu przy wyjazdowym meczu
+      matchTypeSelect.addEventListener("change", () => {
+        if (matchTypeSelect.value === "Wyjazdowy") {
+          locationInput.value = "";
+          locationInput.setAttribute("readonly", true);
+          locationInput.placeholder = "Adres tylko dla meczów domowych";
+        } else {
+          locationInput.removeAttribute("readonly");
+          locationInput.placeholder = "Adres lub stadion";
+        }
+      });
+
       let allMatches = [];
 
       async function loadMatches() {
@@ -355,7 +342,7 @@
       function renderMatches(list) {
         matchesList.innerHTML = "";
         if (list.length === 0) {
-          matchesList.innerHTML = "<p>Brak sparingów spełniających kryteria.</p>";
+          matchesList.innerHTML = "<p>Brak sparingów.</p>";
           return;
         }
 
@@ -373,32 +360,6 @@
           matchesList.appendChild(div);
         });
       }
-
-      const searchInputs = document.querySelectorAll(
-        "#searchTeam, #searchCategory, #searchLevel, #searchDate, #searchType"
-      );
-
-      function filterMatches() {
-        const team = document.getElementById("searchTeam").value.toLowerCase();
-        const category = document.getElementById("searchCategory").value;
-        const level = document.getElementById("searchLevel").value;
-        const date = document.getElementById("searchDate").value;
-        const type = document.getElementById("searchType").value;
-
-        const filtered = allMatches.filter((m) => {
-          return (
-            (!team || (m.team && m.team.toLowerCase().includes(team))) &&
-            (!category || m.category === category) &&
-            (!level || m.level === level) &&
-            (!date || m.date === date) &&
-            (!type || m.matchType === type)
-          );
-        });
-
-        renderMatches(filtered);
-      }
-
-      searchInputs.forEach((el) => el.addEventListener("input", filterMatches));
 
       onAuthStateChanged(auth, async (user) => {
         if (!user) {
@@ -449,7 +410,6 @@
         await loadMatches();
       });
 
-      // 🏁 Zapis sparingu
       form.addEventListener("submit", async (e) => {
         e.preventDefault();
 
@@ -462,7 +422,7 @@
         const location = locationInput.value;
         const notes = notesInput.value;
 
-        // 🚫 Blokada przeszłych dat (również przy ręcznym wpisaniu)
+        // 🚫 Blokada przeszłych dat
         const selectedDateTime = new Date(`${date}T${time || "00:00"}`);
         const now = new Date();
         if (selectedDateTime < now) {
@@ -485,10 +445,7 @@
         confirmation.style.display = "block";
         form.reset();
         teamInput.value = team;
-
-        // 🔄 Odświeżenie listy po dodaniu nowego sparingu
         await loadMatches();
-
         setTimeout(() => (confirmation.style.display = "none"), 3000);
       });
     </script>
