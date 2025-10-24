@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Umawianie sparingu – ZgranyTrener.pl</title>
+    <link rel="stylesheet" href="../style.css" />
+    <link rel="stylesheet" href="../style-profil.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        background: url("profil/background.png") no-repeat center center fixed;
+        background-size: cover;
+      }
+
+      .form-container {
+        max-width: 700px;
+        margin: 100px auto;
+        background: rgba(0, 0, 0, 0.6);
+        padding: 30px 40px;
+        border-radius: 20px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+      }
+
+      h1 {
+        text-align: center;
+        font-size: 28px;
+        margin-bottom: 30px;
+      }
+
+      form {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      label {
+        font-weight: 600;
+        text-align: left;
+      }
+
+      input,
+      select,
+      textarea {
+        padding: 10px 15px;
+        border: none;
+        border-radius: 10px;
+        outline: none;
+        font-family: "Montserrat", sans-serif;
+        font-size: 15px;
+      }
+
+      textarea {
+        resize: none;
+        height: 80px;
+      }
+
+      button {
+        background: #1db954;
+        color: white;
+        border: none;
+        padding: 12px;
+        border-radius: 10px;
+        font-weight: 700;
+        font-size: 16px;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+
+      button:hover {
+        background: #17a445;
+      }
+
+      .back-btn {
+        display: inline-block;
+        margin-top: 20px;
+        color: white;
+        text-decoration: none;
+        font-weight: 600;
+      }
+
+      .confirmation {
+        background: #1db954;
+        padding: 10px;
+        border-radius: 8px;
+        margin-top: 15px;
+        text-align: center;
+        display: none;
+      }
+    </style>
+  </head>
+
+  <body>
+    <header>
+      <div class="logo" style="position: absolute; top: 15px; left: 25px; display: flex; align-items: center;">
+        <img src="profil/logo.png" alt="Logo" height="48" />
+        <span style="margin-left: 10px; font-weight: 700; font-size: 18px;">ZgranyTrener.pl</span>
+      </div>
+    </header>
+
+    <main>
+      <div class="form-container">
+        <h1>Umów sparing</h1>
+        <form id="match-form">
+          <div>
+            <label for="opponent">Przeciwnik</label>
+            <input type="text" id="opponent" placeholder="Nazwa drużyny przeciwnika" required />
+          </div>
+
+          <div>
+            <label for="category">Kategoria wiekowa</label>
+            <select id="category" required>
+              <option value="">Wybierz kategorię</option>
+              <option>U6</option>
+              <option>U7</option>
+              <option>U8</option>
+              <option>U9</option>
+              <option>U10</option>
+              <option>U11</option>
+              <option>U12</option>
+              <option>U13</option>
+              <option>U14</option>
+              <option>U15</option>
+              <option>U16</option>
+              <option>U17</option>
+              <option>U18</option>
+              <option>U19</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="date">Data sparingu</label>
+            <input type="date" id="date" required />
+          </div>
+
+          <div>
+            <label for="location">Miejsce</label>
+            <input type="text" id="location" placeholder="Adres lub stadion" required />
+          </div>
+
+          <div>
+            <label for="notes">Dodatkowe informacje</label>
+            <textarea id="notes" placeholder="Uwagi (opcjonalne)"></textarea>
+          </div>
+
+          <button type="submit">Zapisz sparing</button>
+        </form>
+
+        <div class="confirmation" id="confirmation">
+          ✅ Sparing został zapisany!
+        </div>
+
+        <a href="dashboard.html" class="back-btn">← Powrót do dashboardu</a>
+      </div>
+    </main>
+
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+      import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+      import { getFirestore, addDoc, collection } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyBXwR3VojWtQLA6FsXj2pVQsSTWNNAUhb0",
+        authDomain: "sparingi-app.firebaseapp.com",
+        projectId: "sparingi-app",
+        storageBucket: "sparingi-app.firebasestorage.app",
+        messagingSenderId: "293859421755",
+        appId: "1:293859421755:web:e98887fdc5fb4a79aef61e"
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const db = getFirestore(app);
+
+      const form = document.getElementById("match-form");
+      const confirmation = document.getElementById("confirmation");
+
+      onAuthStateChanged(auth, (user) => {
+        if (!user) {
+          window.location.href = "index.html";
+        } else {
+          form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const opponent = document.getElementById("opponent").value;
+            const category = document.getElementById("category").value;
+            const date = document.getElementById("date").value;
+            const location = document.getElementById("location").value;
+            const notes = document.getElementById("notes").value;
+
+            await addDoc(collection(db, "users", user.uid, "sparingi"), {
+              opponent,
+              category,
+              date,
+              location,
+              notes,
+              status: "zaplanowany",
+              createdAt: new Date()
+            });
+
+            confirmation.style.display = "block";
+            form.reset();
+            setTimeout(() => (confirmation.style.display = "none"), 3000);
+          });
+        }
+      });
+    </script>
+  </body>
+</html>
