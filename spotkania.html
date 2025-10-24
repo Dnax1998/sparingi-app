@@ -31,16 +31,28 @@
       .left-side {
         flex: 1;
         min-width: 300px;
-        background: rgba(0, 0, 0, 0.4);
+        background: rgba(0, 0, 0, 0.45);
         padding: 30px;
         border-radius: 20px;
         height: 500px;
+        overflow-y: auto;
+      }
+
+      .match-item {
+        background: rgba(255, 255, 255, 0.1);
+        margin-bottom: 15px;
+        padding: 12px;
+        border-radius: 10px;
+      }
+
+      .match-item strong {
+        color: #1db954;
       }
 
       .form-container {
         flex: 1;
         max-width: 500px;
-        background: rgba(0, 0, 0, 0.7);
+        background: rgba(0, 0, 0, 0.75);
         padding: 30px 40px;
         border-radius: 20px;
         box-shadow: 0 0 30px rgba(0, 0, 0, 0.6);
@@ -160,8 +172,9 @@
     <main>
       <div class="page-container">
         <div class="left-side">
-          <h2>Twoje sparingi</h2>
-          <p>Wkrótce zobaczysz tu listę zaplanowanych spotkań.</p>
+          <h2>Ogólne sparingi</h2>
+          <p>Lista wszystkich sparingów dodanych przez trenerów:</p>
+          <div id="matches-list"></div>
         </div>
 
         <div class="form-container">
@@ -222,8 +235,7 @@
 
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-      import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-      import { getFirestore, addDoc, collection } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+      import { getFirestore, addDoc, collection, getDocs, orderBy, query } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
       const firebaseConfig = {
         apiKey: "AIzaSyBXwR3VojWtQLA6FsXj2pVQsSTWNNAUhb0",
@@ -235,40 +247,59 @@
       };
 
       const app = initializeApp(firebaseConfig);
-      const auth = getAuth(app);
       const db = getFirestore(app);
 
       const form = document.getElementById("match-form");
       const confirmation = document.getElementById("confirmation");
+      const matchesList = document.getElementById("matches-list");
 
-      onAuthStateChanged(auth, (user) => {
-        if (!user) {
-          window.location.href = "index.html";
-        } else {
-          form.addEventListener("submit", async (e) => {
-            e.preventDefault();
-            const opponent = document.getElementById("opponent").value;
-            const category = document.getElementById("category").value;
-            const date = document.getElementById("date").value;
-            const location = document.getElementById("location").value;
-            const notes = document.getElementById("notes").value;
-
-            await addDoc(collection(db, "users", user.uid, "sparingi"), {
-              opponent,
-              category,
-              date,
-              location,
-              notes,
-              status: "zaplanowany",
-              createdAt: new Date()
-            });
-
-            confirmation.style.display = "block";
-            form.reset();
-            setTimeout(() => (confirmation.style.display = "none"), 3000);
-          });
+      async function loadMatches() {
+        matchesList.innerHTML = "<p>Ładowanie sparingów...</p>";
+        const q = query(collection(db, "sparingi"), orderBy("date", "desc"));
+        const snapshot = await getDocs(q);
+        if (snapshot.empty) {
+          matchesList.innerHTML = "<p>Brak zapisanych sparingów.</p>";
+          return;
         }
+        matchesList.innerHTML = "";
+        snapshot.forEach((doc) => {
+          const data = doc.data();
+          const item = document.createElement("div");
+          item.classList.add("match-item");
+          item.innerHTML = `
+            <strong>${data.opponent}</strong> (${data.category})<br>
+            📅 ${data.date}<br>
+            📍 ${data.location}<br>
+            <small>${data.notes || ""}</small>
+          `;
+          matchesList.appendChild(item);
+        });
+      }
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const opponent = document.getElementById("opponent").value;
+        const category = document.getElementById("category").value;
+        const date = document.getElementById("date").value;
+        const location = document.getElementById("location").value;
+        const notes = document.getElementById("notes").value;
+
+        await addDoc(collection(db, "sparingi"), {
+          opponent,
+          category,
+          date,
+          location,
+          notes,
+          createdAt: new Date()
+        });
+
+        confirmation.style.display = "block";
+        form.reset();
+        await loadMatches();
+        setTimeout(() => (confirmation.style.display = "none"), 3000);
       });
+
+      loadMatches();
     </script>
   </body>
 </html>
