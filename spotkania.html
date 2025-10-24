@@ -204,6 +204,15 @@
             </div>
 
             <div>
+              <label for="matchType">Typ meczu</label>
+              <select id="matchType" required>
+                <option value="">Wybierz typ meczu</option>
+                <option value="Domowy">Mecz domowy</option>
+                <option value="Wyjazdowy">Mecz wyjazdowy</option>
+              </select>
+            </div>
+
+            <div>
               <label for="location">Miejsce</label>
               <input type="text" id="location" placeholder="Adres lub stadion" required />
             </div>
@@ -264,6 +273,7 @@
           item.classList.add("match-item");
           item.innerHTML = `
             <strong>${data.team || "Nieznany klub"}</strong> (${data.category})<br>
+            🏠 ${data.matchType || "Nie podano"}<br>
             📅 ${data.date}<br>
             📍 ${data.location}<br>
             <small>${data.notes || ""}</small>
@@ -285,12 +295,10 @@
           if (userSnap.exists()) {
             const data = userSnap.data();
 
-            // 🏟️ Nazwa klubu
             const clubName = data.klub || data.club || data.clubName || data.team || null;
             if (clubName) teamInput.value = clubName;
             else teamInput.value = "Brak nazwy klubu";
 
-            // 👶 Kategorie wiekowe
             const categoriesRaw = data.kategorie || data.categories || data.kategorie_wiekowe || "";
             let userCategories = [];
 
@@ -321,12 +329,13 @@
           teamInput.value = "Błąd ładowania danych";
         }
 
-        // 💾 Zapisywanie sparingu
+        // 💾 Zapis sparingu
         form.addEventListener("submit", async (e) => {
           e.preventDefault();
           const team = teamInput.value;
           const category = categorySelect.value;
           const date = document.getElementById("date").value;
+          const matchType = document.getElementById("matchType").value;
           const location = document.getElementById("location").value;
           const notes = document.getElementById("notes").value;
 
@@ -334,6 +343,7 @@
             team,
             category,
             date,
+            matchType,
             location,
             notes,
             createdAt: new Date()
