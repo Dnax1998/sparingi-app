@@ -309,8 +309,7 @@
         orderBy,
         query,
         doc,
-        getDoc,
-        deleteDoc
+        getDoc
       } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
       const firebaseConfig = {
@@ -328,9 +327,11 @@
 
       const form = document.getElementById("match-form");
       const matchesList = document.getElementById("matches-list");
+      const teamInput = document.getElementById("team");
 
       let allMatches = [];
 
+      // 🔁 Wczytywanie sparingów
       async function loadMatches() {
         matchesList.innerHTML = "<p>Ładowanie sparingów...</p>";
         const q = query(collection(db, "sparingi"), orderBy("date", "desc"));
@@ -339,6 +340,7 @@
         renderMatches(allMatches);
       }
 
+      // 🎨 Wyświetlanie listy sparingów
       function renderMatches(list) {
         matchesList.innerHTML = "";
         if (list.length === 0) {
@@ -361,7 +363,7 @@
         });
       }
 
-      // 🔎 WYSZUKIWANIE
+      // 🔎 Wyszukiwarka
       const searchInputs = document.querySelectorAll(
         "#searchTeam, #searchCategory, #searchLevel, #searchDate, #searchType"
       );
@@ -388,55 +390,56 @@
 
       searchInputs.forEach((el) => el.addEventListener("input", filterMatches));
 
-     onAuthStateChanged(auth, async (user) => {
-  if (!user) {
-    window.location.href = "index.html";
-    return;
-  }
+      // 🔥 Autoryzacja i wczytanie danych użytkownika
+      onAuthStateChanged(auth, async (user) => {
+        if (!user) {
+          window.location.href = "index.html";
+          return;
+        }
 
-  try {
-    // 🔍 Pobranie danych użytkownika (profil trenera)
-    const userRef = doc(db, "users", user.uid);
-    const userSnap = await getDoc(userRef);
+        try {
+          const userRef = doc(db, "users", user.uid);
+          const userSnap = await getDoc(userRef);
 
-    if (userSnap.exists()) {
-      const data = userSnap.data();
-      const clubName = data.klub || data.club || data.clubName || data.team || null;
-      const categoryData = data.kategorie || data.categories || data.kategorie_wiekowe || "";
+          if (userSnap.exists()) {
+            const data = userSnap.data();
+            const clubName =
+              data.klub || data.club || data.clubName || data.team || "Nieznany klub";
+            teamInput.value = clubName;
 
-      // Ustaw nazwę klubu w polu
-      document.getElementById("team").value = clubName || "Nieznany klub";
+            const categorySelect = document.getElementById("category");
+            const rawCategories =
+              data.kategorie || data.categories || data.kategorie_wiekowe || "";
 
-      // 🔽 Ustawienie dostępnych kategorii z profilu
-      const categorySelect = document.getElementById("category");
-      categorySelect.innerHTML = "";
+            let categories = Array.isArray(rawCategories)
+              ? rawCategories
+              : typeof rawCategories === "string"
+              ? rawCategories.split(",").map((c) => c.trim())
+              : [];
 
-      const userCategories = Array.isArray(categoryData)
-        ? categoryData
-        : typeof categoryData === "string"
-        ? categoryData.split(",").map((c) => c.trim())
-        : [];
+            categorySelect.innerHTML = "";
+            if (categories.length > 0) {
+              categories.forEach((cat) => {
+                const opt = document.createElement("option");
+                opt.value = cat;
+                opt.textContent = cat;
+                categorySelect.appendChild(opt);
+              });
+            } else {
+              const opt = document.createElement("option");
+              opt.textContent = "Brak kategorii w profilu";
+              categorySelect.appendChild(opt);
+            }
+          } else {
+            teamInput.value = "Nie znaleziono profilu użytkownika";
+          }
+        } catch (err) {
+          console.error("Błąd ładowania profilu:", err);
+          teamInput.value = "Błąd ładowania danych";
+        }
 
-      if (userCategories.length > 0) {
-        userCategories.forEach((cat) => {
-          const opt = document.createElement("option");
-          opt.value = cat;
-          opt.textContent = cat;
-          categorySelect.appendChild(opt);
-        });
-      } else {
-        const opt = document.createElement("option");
-        opt.textContent = "Brak kategorii w profilu";
-        categorySelect.appendChild(opt);
-      }
-    } else {
-      document.getElementById("team").value = "Nie znaleziono profilu użytkownika";
-    }
-  } catch (err) {
-    console.error("Błąd przy wczytywaniu danych użytkownika:", err);
-    document.getElementById("team").value = "Błąd ładowania";
-  }
-
-  // ⏱ Załaduj sparingi po wczytaniu profilu
-  await loadMatches();
-});
+        await loadMatches();
+      });
+    </script>
+  </body>
+</html>
