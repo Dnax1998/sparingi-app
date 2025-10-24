@@ -259,6 +259,11 @@
       const categorySelect = document.getElementById("category");
       const matchTypeSelect = document.getElementById("matchType");
       const locationInput = document.getElementById("location");
+      const dateInput = document.getElementById("date");
+
+      // 🔒 Ustawienie minimalnej daty (dzisiaj)
+      const today = new Date().toISOString().split("T")[0];
+      dateInput.min = today;
 
       // 🔁 Blokowanie pola adresu, jeśli wyjazdowy
       matchTypeSelect.addEventListener("change", () => {
@@ -310,17 +315,14 @@
             const data = userSnap.data();
 
             const clubName = data.klub || data.club || data.clubName || data.team || null;
-            if (clubName) teamInput.value = clubName;
-            else teamInput.value = "Brak nazwy klubu";
+            teamInput.value = clubName || "Brak nazwy klubu";
 
             const categoriesRaw = data.kategorie || data.categories || data.kategorie_wiekowe || "";
-            let userCategories = [];
-
-            if (Array.isArray(categoriesRaw)) {
-              userCategories = categoriesRaw;
-            } else if (typeof categoriesRaw === "string") {
-              userCategories = categoriesRaw.split(",").map((c) => c.trim());
-            }
+            let userCategories = Array.isArray(categoriesRaw)
+              ? categoriesRaw
+              : typeof categoriesRaw === "string"
+              ? categoriesRaw.split(",").map((c) => c.trim())
+              : [];
 
             categorySelect.innerHTML = "";
             if (userCategories.length > 0) {
@@ -345,12 +347,22 @@
 
         form.addEventListener("submit", async (e) => {
           e.preventDefault();
+
           const team = teamInput.value;
           const category = categorySelect.value;
-          const date = document.getElementById("date").value;
+          const date = dateInput.value;
           const matchType = matchTypeSelect.value;
           const location = locationInput.value;
           const notes = document.getElementById("notes").value;
+
+          // 🚫 Walidacja daty
+          const selectedDate = new Date(date);
+          const now = new Date();
+          now.setHours(0, 0, 0, 0);
+          if (selectedDate < now) {
+            alert("Nie możesz umawiać sparingu w przeszłości!");
+            return;
+          }
 
           await addDoc(collection(db, "sparingi"), {
             team,
