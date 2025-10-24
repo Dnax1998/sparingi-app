@@ -199,6 +199,17 @@
             </div>
 
             <div>
+              <label for="level">Poziom zaawansowania</label>
+              <select id="level" required>
+                <option value="">Wybierz poziom</option>
+                <option value="Rekreacja">Rekreacja</option>
+                <option value="Podstawowy">Podstawowy</option>
+                <option value="Średniozaawansowany">Średniozaawansowany</option>
+                <option value="Zaawansowany">Zaawansowany</option>
+              </select>
+            </div>
+
+            <div>
               <label for="date">Data sparingu</label>
               <input type="date" id="date" required />
             </div>
@@ -276,8 +287,9 @@
       const locationInput = document.getElementById("location");
       const dateInput = document.getElementById("date");
       const timeInput = document.getElementById("time");
+      const levelSelect = document.getElementById("level");
 
-      // 🔒 Ustawienie minimalnej daty (dzisiaj)
+      // 🔒 Minimalna data (dzisiaj)
       const today = new Date().toISOString().split("T")[0];
       dateInput.min = today;
 
@@ -293,7 +305,7 @@
         }
       });
 
-      // 🧹 Funkcja do usuwania przeszłych meczów
+      // 🧹 Usuwanie przeszłych meczów
       async function cleanOldMatches() {
         const q = query(collection(db, "sparingi"));
         const snapshot = await getDocs(q);
@@ -302,7 +314,6 @@
         snapshot.forEach(async (docSnap) => {
           const data = docSnap.data();
           if (!data.date) return;
-
           const matchDate = new Date(`${data.date}T${data.time || "00:00"}`);
           if (matchDate < now) {
             await deleteDoc(doc(db, "sparingi", docSnap.id));
@@ -310,15 +321,13 @@
         });
       }
 
-      // 📋 Wczytaj aktualne mecze
+      // 📋 Wczytywanie meczów
       async function loadMatches() {
         matchesList.innerHTML = "<p>Ładowanie sparingów...</p>";
-
-        await cleanOldMatches(); // usuń stare mecze przed wczytaniem
+        await cleanOldMatches();
 
         const q = query(collection(db, "sparingi"), orderBy("date", "desc"));
         const snapshot = await getDocs(q);
-
         if (snapshot.empty) {
           matchesList.innerHTML = "<p>Brak zaplanowanych sparingów.</p>";
           return;
@@ -331,6 +340,7 @@
           item.classList.add("match-item");
           item.innerHTML = `
             <strong>${data.team || "Nieznany klub"}</strong> (${data.category})<br>
+            🏆 Poziom: ${data.level || "brak"}<br>
             🏠 ${data.matchType || "Nie podano"}<br>
             📅 ${data.date} ⏰ ${data.time || "brak"}<br>
             ${data.location ? "📍 " + data.location + "<br>" : ""}
@@ -352,7 +362,6 @@
 
           if (userSnap.exists()) {
             const data = userSnap.data();
-
             const clubName = data.klub || data.club || data.clubName || data.team || null;
             teamInput.value = clubName || "Brak nazwy klubu";
 
@@ -384,19 +393,20 @@
           teamInput.value = "Błąd ładowania danych";
         }
 
-        // 📅 Zapis sparingu
+        // 🏁 Zapis meczu
         form.addEventListener("submit", async (e) => {
           e.preventDefault();
 
           const team = teamInput.value;
           const category = categorySelect.value;
+          const level = levelSelect.value;
           const date = dateInput.value;
           const time = timeInput.value;
           const matchType = matchTypeSelect.value;
           const location = locationInput.value;
           const notes = document.getElementById("notes").value;
 
-          // 🚫 Walidacja daty + godziny
+          // 🚫 Walidacja daty
           const selected = new Date(`${date}T${time}`);
           const now = new Date();
           if (selected < now) {
@@ -407,6 +417,7 @@
           await addDoc(collection(db, "sparingi"), {
             team,
             category,
+            level,
             date,
             time,
             matchType,
