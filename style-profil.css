@@ -265,22 +265,3 @@ body {
   from { opacity: 0; transform: scale(0.9); }
   to { opacity: 1; transform: scale(1); }
 }
-.user-name {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  justify-content: center;
-  font-size: 28px;
-  font-weight: 700;
-  color: #fff;
-}
-
-.edit-icon {
-  cursor: pointer;
-  font-size: 20px;
-  transition: transform 0.2s ease;
-}
-
-.edit-icon:hover {
-  transform: scale(1.2);
-}
