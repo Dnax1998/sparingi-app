@@ -194,21 +194,7 @@
             <div>
               <label for="category">Kategoria wiekowa</label>
               <select id="category" required>
-                <option value="">Wybierz kategorię</option>
-                <option>U6</option>
-                <option>U7</option>
-                <option>U8</option>
-                <option>U9</option>
-                <option>U10</option>
-                <option>U11</option>
-                <option>U12</option>
-                <option>U13</option>
-                <option>U14</option>
-                <option>U15</option>
-                <option>U16</option>
-                <option>U17</option>
-                <option>U18</option>
-                <option>U19</option>
+                <option value="">Wczytywanie...</option>
               </select>
             </div>
 
@@ -261,6 +247,7 @@
       const confirmation = document.getElementById("confirmation");
       const matchesList = document.getElementById("matches-list");
       const teamInput = document.getElementById("team");
+      const categorySelect = document.getElementById("category");
 
       async function loadMatches() {
         matchesList.innerHTML = "<p>Ładowanie sparingów...</p>";
@@ -297,26 +284,48 @@
 
           if (userSnap.exists()) {
             const data = userSnap.data();
-            const clubName = data.klub || data.club || data.clubName || data.team || null;
 
-            if (clubName) {
-              teamInput.value = clubName;
+            // 🏟️ Nazwa klubu
+            const clubName = data.klub || data.club || data.clubName || data.team || null;
+            if (clubName) teamInput.value = clubName;
+            else teamInput.value = "Brak nazwy klubu";
+
+            // 👶 Kategorie wiekowe
+            const categoriesRaw = data.kategorie || data.categories || data.kategorie_wiekowe || "";
+            let userCategories = [];
+
+            if (Array.isArray(categoriesRaw)) {
+              userCategories = categoriesRaw;
+            } else if (typeof categoriesRaw === "string") {
+              userCategories = categoriesRaw.split(",").map((c) => c.trim());
+            }
+
+            categorySelect.innerHTML = "";
+            if (userCategories.length > 0) {
+              userCategories.forEach((cat) => {
+                const opt = document.createElement("option");
+                opt.value = cat;
+                opt.textContent = cat;
+                categorySelect.appendChild(opt);
+              });
             } else {
-              teamInput.value = "Brak nazwy klubu w profilu";
-              console.warn("Pole 'klub' nie istnieje w dokumencie użytkownika:", data);
+              const opt = document.createElement("option");
+              opt.textContent = "Brak kategorii w profilu";
+              categorySelect.appendChild(opt);
             }
           } else {
             teamInput.value = "Nie znaleziono profilu użytkownika";
           }
         } catch (error) {
-          console.error("Błąd przy pobieraniu danych klubu:", error);
-          teamInput.value = "Błąd ładowania klubu";
+          console.error("Błąd przy pobieraniu danych użytkownika:", error);
+          teamInput.value = "Błąd ładowania danych";
         }
 
+        // 💾 Zapisywanie sparingu
         form.addEventListener("submit", async (e) => {
           e.preventDefault();
           const team = teamInput.value;
-          const category = document.getElementById("category").value;
+          const category = categorySelect.value;
           const date = document.getElementById("date").value;
           const location = document.getElementById("location").value;
           const notes = document.getElementById("notes").value;
