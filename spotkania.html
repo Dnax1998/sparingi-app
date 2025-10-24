@@ -36,7 +36,7 @@
         border-radius: 20px;
         height: 500px;
         overflow-y: auto;
-        margin-top: 0px;
+        margin-top: 120px;
       }
 
       .search-bar {
@@ -328,10 +328,14 @@
       const form = document.getElementById("match-form");
       const matchesList = document.getElementById("matches-list");
       const teamInput = document.getElementById("team");
+      const dateInput = document.getElementById("date");
+
+      // 🔒 Blokada wyboru przeszłych dat
+      const today = new Date().toISOString().split("T")[0];
+      dateInput.min = today;
 
       let allMatches = [];
 
-      // 🔁 Wczytywanie sparingów
       async function loadMatches() {
         matchesList.innerHTML = "<p>Ładowanie sparingów...</p>";
         const q = query(collection(db, "sparingi"), orderBy("date", "desc"));
@@ -340,7 +344,6 @@
         renderMatches(allMatches);
       }
 
-      // 🎨 Wyświetlanie listy sparingów
       function renderMatches(list) {
         matchesList.innerHTML = "";
         if (list.length === 0) {
@@ -363,7 +366,6 @@
         });
       }
 
-      // 🔎 Wyszukiwarka
       const searchInputs = document.querySelectorAll(
         "#searchTeam, #searchCategory, #searchLevel, #searchDate, #searchType"
       );
@@ -390,7 +392,6 @@
 
       searchInputs.forEach((el) => el.addEventListener("input", filterMatches));
 
-      // 🔥 Autoryzacja i wczytanie danych użytkownika
       onAuthStateChanged(auth, async (user) => {
         if (!user) {
           window.location.href = "index.html";
