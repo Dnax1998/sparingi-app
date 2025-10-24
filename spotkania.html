@@ -181,6 +181,44 @@
         <div class="left-side">
           <h2>Ogólne sparingi</h2>
           <p>Lista wszystkich sparingów dodanych przez trenerów:</p>
+          <!-- 🔍 WYSZUKIWARKA SPARINGÓW -->
+<div class="search-bar">
+  <input type="text" id="searchTeam" placeholder="Wpisz nazwę drużyny..." />
+  <select id="searchCategory">
+    <option value="">Kategoria</option>
+    <option value="U6">U6</option>
+    <option value="U7">U7</option>
+    <option value="U8">U8</option>
+    <option value="U9">U9</option>
+    <option value="U10">U10</option>
+    <option value="U11">U11</option>
+    <option value="U12">U12</option>
+    <option value="U13">U13</option>
+    <option value="U14">U14</option>
+    <option value="U15">U15</option>
+    <option value="U16">U16</option>
+    <option value="U17">U17</option>
+    <option value="U18">U18</option>
+    <option value="U19">U19</option>
+  </select>
+
+  <select id="searchLevel">
+    <option value="">Poziom</option>
+    <option value="Rekreacja">Rekreacja</option>
+    <option value="Podstawowy">Podstawowy</option>
+    <option value="Średniozaawansowany">Średniozaawansowany</option>
+    <option value="Zaawansowany">Zaawansowany</option>
+  </select>
+
+  <input type="date" id="searchDate" />
+
+  <select id="searchType">
+    <option value="">Typ meczu</option>
+    <option value="Domowy">Domowy</option>
+    <option value="Wyjazdowy">Wyjazdowy</option>
+  </select>
+</div>
+
           <div id="matches-list"></div>
         </div>
 
