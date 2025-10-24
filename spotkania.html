@@ -388,10 +388,55 @@
 
       searchInputs.forEach((el) => el.addEventListener("input", filterMatches));
 
-      onAuthStateChanged(auth, async (user) => {
-        if (!user) return;
-        await loadMatches();
-      });
-    </script>
-  </body>
-</html>
+     onAuthStateChanged(auth, async (user) => {
+  if (!user) {
+    window.location.href = "index.html";
+    return;
+  }
+
+  try {
+    // 🔍 Pobranie danych użytkownika (profil trenera)
+    const userRef = doc(db, "users", user.uid);
+    const userSnap = await getDoc(userRef);
+
+    if (userSnap.exists()) {
+      const data = userSnap.data();
+      const clubName = data.klub || data.club || data.clubName || data.team || null;
+      const categoryData = data.kategorie || data.categories || data.kategorie_wiekowe || "";
+
+      // Ustaw nazwę klubu w polu
+      document.getElementById("team").value = clubName || "Nieznany klub";
+
+      // 🔽 Ustawienie dostępnych kategorii z profilu
+      const categorySelect = document.getElementById("category");
+      categorySelect.innerHTML = "";
+
+      const userCategories = Array.isArray(categoryData)
+        ? categoryData
+        : typeof categoryData === "string"
+        ? categoryData.split(",").map((c) => c.trim())
+        : [];
+
+      if (userCategories.length > 0) {
+        userCategories.forEach((cat) => {
+          const opt = document.createElement("option");
+          opt.value = cat;
+          opt.textContent = cat;
+          categorySelect.appendChild(opt);
+        });
+      } else {
+        const opt = document.createElement("option");
+        opt.textContent = "Brak kategorii w profilu";
+        categorySelect.appendChild(opt);
+      }
+    } else {
+      document.getElementById("team").value = "Nie znaleziono profilu użytkownika";
+    }
+  } catch (err) {
+    console.error("Błąd przy wczytywaniu danych użytkownika:", err);
+    document.getElementById("team").value = "Błąd ładowania";
+  }
+
+  // ⏱ Załaduj sparingi po wczytaniu profilu
+  await loadMatches();
+});
