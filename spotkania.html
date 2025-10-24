@@ -204,6 +204,11 @@
             </div>
 
             <div>
+              <label for="time">Godzina sparingu</label>
+              <input type="time" id="time" required />
+            </div>
+
+            <div>
               <label for="matchType">Typ meczu</label>
               <select id="matchType" required>
                 <option value="">Wybierz typ meczu</option>
@@ -260,6 +265,7 @@
       const matchTypeSelect = document.getElementById("matchType");
       const locationInput = document.getElementById("location");
       const dateInput = document.getElementById("date");
+      const timeInput = document.getElementById("time");
 
       // 🔒 Ustawienie minimalnej daty (dzisiaj)
       const today = new Date().toISOString().split("T")[0];
@@ -293,7 +299,7 @@
           item.innerHTML = `
             <strong>${data.team || "Nieznany klub"}</strong> (${data.category})<br>
             🏠 ${data.matchType || "Nie podano"}<br>
-            📅 ${data.date}<br>
+            📅 ${data.date} ⏰ ${data.time || "brak"}<br>
             ${data.location ? "📍 " + data.location + "<br>" : ""}
             <small>${data.notes || ""}</small>
           `;
@@ -351,15 +357,15 @@
           const team = teamInput.value;
           const category = categorySelect.value;
           const date = dateInput.value;
+          const time = timeInput.value;
           const matchType = matchTypeSelect.value;
           const location = locationInput.value;
           const notes = document.getElementById("notes").value;
 
-          // 🚫 Walidacja daty
-          const selectedDate = new Date(date);
+          // 🚫 Walidacja daty + godziny
+          const selected = new Date(`${date}T${time}`);
           const now = new Date();
-          now.setHours(0, 0, 0, 0);
-          if (selectedDate < now) {
+          if (selected < now) {
             alert("Nie możesz umawiać sparingu w przeszłości!");
             return;
           }
@@ -368,6 +374,7 @@
             team,
             category,
             date,
+            time,
             matchType,
             location,
             notes,
