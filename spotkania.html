@@ -342,6 +342,18 @@
       const today = new Date().toISOString().split("T")[0];
       dateInput.min = today;
 
+      // 🏠/🚗 Blokowanie pola adresu przy wyjazdowym meczu
+      matchTypeSelect.addEventListener("change", () => {
+        if (matchTypeSelect.value === "Wyjazdowy") {
+          locationInput.value = "";
+          locationInput.setAttribute("readonly", true);
+          locationInput.placeholder = "Adres tylko dla meczów domowych";
+        } else {
+          locationInput.removeAttribute("readonly");
+          locationInput.placeholder = "Adres lub stadion";
+        }
+      });
+
       let allMatches = [];
 
       async function loadMatches() {
@@ -355,7 +367,7 @@
       function renderMatches(list) {
         matchesList.innerHTML = "";
         if (list.length === 0) {
-          matchesList.innerHTML = "<p>Brak sparingów spełniających kryteria.</p>";
+          matchesList.innerHTML = "<p>Brak sparingów.</p>";
           return;
         }
 
@@ -449,7 +461,6 @@
         await loadMatches();
       });
 
-      // 🏁 Zapis sparingu
       form.addEventListener("submit", async (e) => {
         e.preventDefault();
 
@@ -462,7 +473,7 @@
         const location = locationInput.value;
         const notes = notesInput.value;
 
-        // 🚫 Blokada przeszłych dat (również przy ręcznym wpisaniu)
+        // 🚫 Blokada przeszłych dat
         const selectedDateTime = new Date(`${date}T${time || "00:00"}`);
         const now = new Date();
         if (selectedDateTime < now) {
@@ -477,7 +488,7 @@
           date,
           time,
           matchType,
-          location,
+          location: matchType === "Wyjazdowy" ? "" : location, // 🆕 adres tylko przy meczach domowych
           notes,
           createdAt: new Date()
         });
@@ -485,10 +496,7 @@
         confirmation.style.display = "block";
         form.reset();
         teamInput.value = team;
-
-        // 🔄 Odświeżenie listy po dodaniu nowego sparingu
         await loadMatches();
-
         setTimeout(() => (confirmation.style.display = "none"), 3000);
       });
     </script>
