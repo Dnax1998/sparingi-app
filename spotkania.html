@@ -242,7 +242,17 @@
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
       import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-      import { getFirestore, addDoc, collection, getDocs, orderBy, query, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+      import {
+        getFirestore,
+        addDoc,
+        collection,
+        getDocs,
+        orderBy,
+        query,
+        doc,
+        getDoc,
+        deleteDoc
+      } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
       const firebaseConfig = {
         apiKey: "AIzaSyBXwR3VojWtQLA6FsXj2pVQsSTWNNAUhb0",
@@ -283,14 +293,37 @@
         }
       });
 
+      // 🧹 Funkcja do usuwania przeszłych meczów
+      async function cleanOldMatches() {
+        const q = query(collection(db, "sparingi"));
+        const snapshot = await getDocs(q);
+        const now = new Date();
+
+        snapshot.forEach(async (docSnap) => {
+          const data = docSnap.data();
+          if (!data.date) return;
+
+          const matchDate = new Date(`${data.date}T${data.time || "00:00"}`);
+          if (matchDate < now) {
+            await deleteDoc(doc(db, "sparingi", docSnap.id));
+          }
+        });
+      }
+
+      // 📋 Wczytaj aktualne mecze
       async function loadMatches() {
         matchesList.innerHTML = "<p>Ładowanie sparingów...</p>";
+
+        await cleanOldMatches(); // usuń stare mecze przed wczytaniem
+
         const q = query(collection(db, "sparingi"), orderBy("date", "desc"));
         const snapshot = await getDocs(q);
+
         if (snapshot.empty) {
-          matchesList.innerHTML = "<p>Brak zapisanych sparingów.</p>";
+          matchesList.innerHTML = "<p>Brak zaplanowanych sparingów.</p>";
           return;
         }
+
         matchesList.innerHTML = "";
         snapshot.forEach((doc) => {
           const data = doc.data();
@@ -351,6 +384,7 @@
           teamInput.value = "Błąd ładowania danych";
         }
 
+        // 📅 Zapis sparingu
         form.addEventListener("submit", async (e) => {
           e.preventDefault();
 
