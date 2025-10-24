@@ -276,7 +276,7 @@
           const item = document.createElement("div");
           item.classList.add("match-item");
           item.innerHTML = `
-            <strong>${data.team}</strong> (${data.category})<br>
+            <strong>${data.team || "Nieznany klub"}</strong> (${data.category})<br>
             📅 ${data.date}<br>
             📍 ${data.location}<br>
             <small>${data.notes || ""}</small>
@@ -288,37 +288,54 @@
       onAuthStateChanged(auth, async (user) => {
         if (!user) {
           window.location.href = "index.html";
-        } else {
-          const userDoc = await getDoc(doc(db, "users", user.uid));
-          if (userDoc.exists()) {
-            const userData = userDoc.data();
-            teamInput.value = userData.klub || "Nieznany klub";
-          }
-
-          form.addEventListener("submit", async (e) => {
-            e.preventDefault();
-            const team = teamInput.value;
-            const category = document.getElementById("category").value;
-            const date = document.getElementById("date").value;
-            const location = document.getElementById("location").value;
-            const notes = document.getElementById("notes").value;
-
-            await addDoc(collection(db, "sparingi"), {
-              team,
-              category,
-              date,
-              location,
-              notes,
-              createdAt: new Date()
-            });
-
-            confirmation.style.display = "block";
-            form.reset();
-            teamInput.value = team;
-            await loadMatches();
-            setTimeout(() => (confirmation.style.display = "none"), 3000);
-          });
+          return;
         }
+
+        try {
+          const userRef = doc(db, "users", user.uid);
+          const userSnap = await getDoc(userRef);
+
+          if (userSnap.exists()) {
+            const data = userSnap.data();
+            const clubName = data.klub || data.club || data.clubName || data.team || null;
+
+            if (clubName) {
+              teamInput.value = clubName;
+            } else {
+              teamInput.value = "Brak nazwy klubu w profilu";
+              console.warn("Pole 'klub' nie istnieje w dokumencie użytkownika:", data);
+            }
+          } else {
+            teamInput.value = "Nie znaleziono profilu użytkownika";
+          }
+        } catch (error) {
+          console.error("Błąd przy pobieraniu danych klubu:", error);
+          teamInput.value = "Błąd ładowania klubu";
+        }
+
+        form.addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const team = teamInput.value;
+          const category = document.getElementById("category").value;
+          const date = document.getElementById("date").value;
+          const location = document.getElementById("location").value;
+          const notes = document.getElementById("notes").value;
+
+          await addDoc(collection(db, "sparingi"), {
+            team,
+            category,
+            date,
+            location,
+            notes,
+            createdAt: new Date()
+          });
+
+          confirmation.style.display = "block";
+          form.reset();
+          teamInput.value = team;
+          await loadMatches();
+          setTimeout(() => (confirmation.style.display = "none"), 3000);
+        });
 
         await loadMatches();
       });
