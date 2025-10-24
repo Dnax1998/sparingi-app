@@ -209,9 +209,10 @@
             <input type="text" id="searchTeam" placeholder="Nazwa drużyny..." />
             <select id="searchCategory">
               <option value="">Kategoria</option>
-              <option>U6</option><option>U7</option><option>U8</option><option>U9</option><option>U10</option>
-              <option>U11</option><option>U12</option><option>U13</option><option>U14</option><option>U15</option>
-              <option>U16</option><option>U17</option><option>U18</option><option>U19</option>
+              <option>U6</option><option>U7</option><option>U8</option><option>U9</option>
+              <option>U10</option><option>U11</option><option>U12</option><option>U13</option>
+              <option>U14</option><option>U15</option><option>U16</option><option>U17</option>
+              <option>U18</option><option>U19</option>
             </select>
             <select id="searchLevel">
               <option value="">Poziom</option>
@@ -329,8 +330,15 @@
       const matchesList = document.getElementById("matches-list");
       const teamInput = document.getElementById("team");
       const dateInput = document.getElementById("date");
+      const timeInput = document.getElementById("time");
+      const categorySelect = document.getElementById("category");
+      const levelSelect = document.getElementById("level");
+      const matchTypeSelect = document.getElementById("matchType");
+      const locationInput = document.getElementById("location");
+      const notesInput = document.getElementById("notes");
+      const confirmation = document.getElementById("confirmation");
 
-      // 🔒 Blokada wyboru przeszłych dat
+      // 🔒 Minimalna data (dzisiaj)
       const today = new Date().toISOString().split("T")[0];
       dateInput.min = today;
 
@@ -408,7 +416,6 @@
               data.klub || data.club || data.clubName || data.team || "Nieznany klub";
             teamInput.value = clubName;
 
-            const categorySelect = document.getElementById("category");
             const rawCategories =
               data.kategorie || data.categories || data.kategorie_wiekowe || "";
 
@@ -440,6 +447,49 @@
         }
 
         await loadMatches();
+      });
+
+      // 🏁 Zapis sparingu
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const team = teamInput.value;
+        const category = categorySelect.value;
+        const level = levelSelect.value;
+        const date = dateInput.value;
+        const time = timeInput.value;
+        const matchType = matchTypeSelect.value;
+        const location = locationInput.value;
+        const notes = notesInput.value;
+
+        // 🚫 Blokada przeszłych dat (również przy ręcznym wpisaniu)
+        const selectedDateTime = new Date(`${date}T${time || "00:00"}`);
+        const now = new Date();
+        if (selectedDateTime < now) {
+          alert("Nie możesz umawiać sparingu w przeszłości!");
+          return;
+        }
+
+        await addDoc(collection(db, "sparingi"), {
+          team,
+          category,
+          level,
+          date,
+          time,
+          matchType,
+          location,
+          notes,
+          createdAt: new Date()
+        });
+
+        confirmation.style.display = "block";
+        form.reset();
+        teamInput.value = team;
+
+        // 🔄 Odświeżenie listy po dodaniu nowego sparingu
+        await loadMatches();
+
+        setTimeout(() => (confirmation.style.display = "none"), 3000);
       });
     </script>
   </body>
