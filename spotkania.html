@@ -4,7 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Umawianie sparingu – ZgranyTrener.pl</title>
-
     <link rel="stylesheet" href="../style.css" />
     <link rel="stylesheet" href="../style-profil.css" />
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet"/>
@@ -49,18 +48,23 @@
         margin-top: 120px;
       }
 
+      .left-side h2 { margin: 0 0 8px 0; font-size: 28px; }
+      .left-side p { margin-top: 0; }
+
       .filters {
         display: grid;
         grid-template-columns: 1.2fr 0.9fr 0.9fr 0.9fr 1fr;
         gap: 10px;
         margin: 18px 0 20px 0;
       }
-      .filters input, .filters select {
+      .filters input,
+      .filters select {
         padding: 10px 12px;
         border: none;
         border-radius: 10px;
         outline: none;
         font-size: 14px;
+        box-sizing: border-box;
       }
 
       .match-item {
@@ -70,37 +74,35 @@
         border-radius: 12px;
         display: grid;
         grid-template-columns: 1fr auto;
+        gap: 10px;
         align-items: center;
       }
+      .match-main strong { color: #1db954; }
 
       .match-actions {
         display: flex;
+        flex-direction: column;
         gap: 6px;
       }
 
       .match-actions button {
         border: none;
-        padding: 8px 10px;
-        border-radius: 8px;
+        border-radius: 10px;
         font-weight: 700;
         cursor: pointer;
+        padding: 8px 10px;
+        color: #fff;
       }
 
       .match-actions .details-btn {
         background: #0ea5e9;
-        color: white;
       }
-      .match-actions .details-btn:hover {
-        background: #0284c7;
-      }
+      .match-actions .details-btn:hover { background: #0284c7; }
 
       .match-actions .accept-btn {
         background: #dc2626;
-        color: white;
       }
-      .match-actions .accept-btn:hover {
-        background: #b91c1c;
-      }
+      .match-actions .accept-btn:hover { background: #b91c1c; }
 
       .form-container {
         flex: 1 1 420px;
@@ -111,22 +113,21 @@
         box-shadow: 0 0 30px rgba(0, 0, 0, 0.6);
       }
 
-      .form-container h1 {
-        text-align: center;
-        font-size: 28px;
-        margin-bottom: 18px;
-      }
+      .form-container h1 { text-align: center; font-size: 28px; margin: 0 0 18px 0; }
 
       form {
         display: flex;
         flex-direction: column;
         gap: 20px;
       }
+
       label {
         font-weight: 600;
+        text-align: left;
         display: block;
         margin-bottom: 5px;
       }
+
       input, select, textarea {
         padding: 10px 15px;
         border: none;
@@ -135,14 +136,17 @@
         font-family: "Montserrat", sans-serif;
         font-size: 15px;
         width: 100%;
+        box-sizing: border-box;
         background: #fff;
         color: #000;
       }
+
       input[readonly] {
-        background: rgba(255,255,255,0.1);
+        background: rgba(255, 255, 255, 0.1);
         color: #ccc;
         cursor: not-allowed;
       }
+
       textarea { resize: none; height: 80px; }
 
       button {
@@ -154,6 +158,7 @@
         font-weight: 700;
         font-size: 16px;
         cursor: pointer;
+        transition: 0.2s;
       }
       button:hover { background: #17a445; }
 
@@ -164,40 +169,6 @@
         margin-top: 12px;
         text-align: center;
         display: none;
-      }
-
-      .modal {
-        position: fixed;
-        inset: 0;
-        display: none;
-        place-items: center;
-        background: rgba(0,0,0,.5);
-        z-index: 50;
-      }
-      .modal.open { display: grid; }
-      .modal-card {
-        width: min(560px, 92vw);
-        background: #0b1d14;
-        color: #fff;
-        border-radius: 16px;
-        padding: 22px;
-      }
-      .modal-card h3 { margin: 0 0 14px 0; }
-      .modal-row { margin: 8px 0; }
-      .modal-actions {
-        display: flex;
-        justify-content: flex-end;
-        gap: 10px;
-        margin-top: 14px;
-      }
-      .btn-secondary {
-        background: #0ea5e9;
-        color: #fff;
-        border: none;
-        padding: 10px 12px;
-        border-radius: 10px;
-        font-weight: 700;
-        cursor: pointer;
       }
 
       @media (max-width: 900px) {
@@ -219,30 +190,95 @@
 
     <main>
       <div class="page-container">
+        <!-- LEWA: LISTA SPARINGÓW -->
         <section class="left-side">
           <h2>Ogólne sparingi</h2>
           <p>Lista wszystkich sparingów dodanych przez trenerów:</p>
-          <div class="filters">
+
+          <div class="filters" id="filters">
             <input id="f-team" type="text" placeholder="Nazwa drużyny…" />
-            <select id="f-category"><option value="">Kategoria</option><option>U6</option><option>U7</option><option>U8</option><option>U9</option><option>U10</option><option>U11</option><option>U12</option><option>U13</option><option>U14</option><option>U15</option><option>U16</option><option>U17</option><option>U18</option><option>U19</option></select>
-            <select id="f-level"><option value="">Poziom</option><option>Rekreacja</option><option>Podstawowy</option><option>Średniozaawansowany</option><option>Zaawansowany</option></select>
+            <select id="f-category">
+              <option value="">Kategoria</option>
+              <option>U6</option><option>U7</option><option>U8</option>
+              <option>U9</option><option>U10</option><option>U11</option>
+              <option>U12</option><option>U13</option><option>U14</option>
+              <option>U15</option><option>U16</option><option>U17</option>
+              <option>U18</option><option>U19</option>
+            </select>
+            <select id="f-level">
+              <option value="">Poziom</option>
+              <option>Rekreacja</option>
+              <option>Podstawowy</option>
+              <option>Średniozaawansowany</option>
+              <option>Zaawansowany</option>
+            </select>
             <input id="f-date" type="date" />
-            <select id="f-type"><option value="">Typ meczu</option><option>Domowy</option><option>Wyjazdowy</option></select>
+            <select id="f-type">
+              <option value="">Typ meczu</option>
+              <option>Domowy</option>
+              <option>Wyjazdowy</option>
+            </select>
           </div>
+
           <div id="matches-list"></div>
         </section>
 
+        <!-- PRAWA: FORMULARZ -->
         <section class="form-container">
           <h1>Umów sparing</h1>
           <form id="match-form">
-            <div><label for="team">Twoja drużyna</label><input type="text" id="team" readonly placeholder="Ładowanie nazwy klubu..." /></div>
-            <div><label for="category">Kategoria wiekowa</label><select id="category" required><option value="">Wczytywanie…</option></select></div>
-            <div><label for="level">Poziom zaawansowania</label><select id="level" required><option value="">Wybierz poziom</option><option value="Rekreacja">Rekreacja</option><option value="Podstawowy">Podstawowy</option><option value="Średniozaawansowany">Średniozaawansowany</option><option value="Zaawansowany">Zaawansowany</option></select></div>
-            <div><label for="date">Data sparingu</label><input type="date" id="date" required /></div>
-            <div><label for="time">Godzina sparingu</label><input type="time" id="time" required /></div>
-            <div><label for="matchType">Typ meczu</label><select id="matchType" required><option value="">Wybierz typ meczu</option><option value="Domowy">Mecz domowy</option><option value="Wyjazdowy">Mecz wyjazdowy</option></select></div>
-            <div><label for="location">Miejsce</label><input type="text" id="location" placeholder="Adres lub stadion" /></div>
-            <div><label for="notes">Dodatkowe informacje</label><textarea id="notes" placeholder="Uwagi (opcjonalne)"></textarea></div>
+            <div>
+              <label for="team">Twoja drużyna</label>
+              <input type="text" id="team" readonly placeholder="Ładowanie nazwy klubu..." />
+            </div>
+
+            <div>
+              <label for="category">Kategoria wiekowa</label>
+              <select id="category" required>
+                <option value="">Wczytywanie…</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="level">Poziom zaawansowania</label>
+              <select id="level" required>
+                <option value="">Wybierz poziom</option>
+                <option value="Rekreacja">Rekreacja</option>
+                <option value="Podstawowy">Podstawowy</option>
+                <option value="Średniozaawansowany">Średniozaawansowany</option>
+                <option value="Zaawansowany">Zaawansowany</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="date">Data sparingu</label>
+              <input type="date" id="date" required />
+            </div>
+
+            <div>
+              <label for="time">Godzina sparingu</label>
+              <input type="time" id="time" required />
+            </div>
+
+            <div>
+              <label for="matchType">Typ meczu</label>
+              <select id="matchType" required>
+                <option value="">Wybierz typ meczu</option>
+                <option value="Domowy">Mecz domowy</option>
+                <option value="Wyjazdowy">Mecz wyjazdowy</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="location">Miejsce</label>
+              <input type="text" id="location" placeholder="Adres lub stadion" />
+            </div>
+
+            <div>
+              <label for="notes">Dodatkowe informacje</label>
+              <textarea id="notes" placeholder="Uwagi (opcjonalne)"></textarea>
+            </div>
+
             <button type="submit">Zapisz sparing</button>
           </form>
           <div class="confirmation" id="confirmation">✅ Sparing został zapisany!</div>
@@ -250,24 +286,12 @@
       </div>
     </main>
 
-    <div class="modal" id="details-modal">
-      <div class="modal-card">
-        <h3 id="md-title">Szczegóły sparingu</h3>
-        <div id="md-team"></div>
-        <div id="md-category"></div>
-        <div id="md-level"></div>
-        <div id="md-type"></div>
-        <div id="md-datetime"></div>
-        <div id="md-location"></div>
-        <div id="md-notes"></div>
-        <div class="modal-actions"><button class="btn-secondary" id="md-close">Zamknij</button></div>
-      </div>
-    </div>
-
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
       import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-      import { getFirestore, addDoc, collection, deleteDoc, doc, getDoc, onSnapshot, orderBy, query } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+      import {
+        getFirestore, addDoc, collection, deleteDoc, doc, getDoc, onSnapshot, orderBy, query
+      } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
       const firebaseConfig = {
         apiKey: "AIzaSyBXwR3VojWtQLA6FsXj2pVQsSTWNNAUhb0",
@@ -282,91 +306,122 @@
       const auth = getAuth(app);
       const db = getFirestore(app);
 
+      const form = document.getElementById("match-form");
+      const confirmation = document.getElementById("confirmation");
       const matchesList = document.getElementById("matches-list");
       const teamInput = document.getElementById("team");
       const categorySelect = document.getElementById("category");
+      const matchTypeSelect = document.getElementById("matchType");
+      const locationInput = document.getElementById("location");
+      const dateInput = document.getElementById("date");
+      const timeInput = document.getElementById("time");
+      const levelSelect = document.getElementById("level");
+
+      const today = new Date().toISOString().split("T")[0];
+      dateInput.min = today;
+
+      matchTypeSelect.addEventListener("change", () => {
+        if (matchTypeSelect.value === "Wyjazdowy") {
+          locationInput.value = "";
+          locationInput.setAttribute("readonly", true);
+          locationInput.placeholder = "Adres tylko dla meczów domowych";
+        } else {
+          locationInput.removeAttribute("readonly");
+          locationInput.placeholder = "Adres lub stadion";
+        }
+      });
 
       let currentUser = null;
-      let currentTeam = "";
+      let currentClub = "";
 
       async function acceptMatch(id, data) {
+        if (!currentUser) return alert("Musisz być zalogowany, aby zaakceptować sparing.");
         await addDoc(collection(db, "zaakceptowane_sparingi"), {
           ...data,
-          acceptedBy: currentUser?.uid || "anon",
-          acceptedTeam: currentTeam,
+          acceptedBy: currentUser.uid,
+          acceptedTeam: currentClub,
           acceptedAt: new Date().toISOString()
         });
         await deleteDoc(doc(db, "sparingi", id));
         alert("✅ Sparing zaakceptowany!");
       }
 
-      function renderList(list) {
+      function renderMatches(matches) {
         matchesList.innerHTML = "";
-        if (!list.length) {
+        if (!matches.length) {
           matchesList.innerHTML = "<p>Brak sparingów.</p>";
           return;
         }
-        list.forEach(({ id, data }) => {
+        matches.forEach((m) => {
           const div = document.createElement("div");
-          div.className = "match-item";
+          div.classList.add("match-item");
           div.innerHTML = `
-            <div>
-              <strong>${data.team}</strong> (${data.category})<br>
-              🏆 Poziom: ${data.level} | 🏁 ${data.matchType}<br>
-              📅 ${data.date} ⏰ ${data.time}<br>
-              ${data.location ? "📍 " + data.location : ""}
+            <div class="match-main">
+              <strong>${m.data.team}</strong> (${m.data.category})<br>
+              🏆 Poziom: ${m.data.level || "-"} | 🏁 ${m.data.matchType}<br>
+              📅 ${m.data.date} ⏰ ${m.data.time}<br>
+              ${m.data.location ? "📍 " + m.data.location : ""}
             </div>
             <div class="match-actions">
               <button class="details-btn">Szczegóły</button>
               <button class="accept-btn">Zaakceptuj</button>
             </div>
           `;
-          div.querySelector(".details-btn").addEventListener("click", () => openDetails(data));
-          div.querySelector(".accept-btn").addEventListener("click", () => acceptMatch(id, data));
+          div.querySelector(".accept-btn").addEventListener("click", () => acceptMatch(m.id, m.data));
           matchesList.appendChild(div);
         });
       }
 
-      function openDetails(data) {
-        document.getElementById("md-title").textContent = `Szczegóły: ${data.team}`;
-        document.getElementById("md-team").textContent = `Drużyna: ${data.team}`;
-        document.getElementById("md-category").textContent = `Kategoria: ${data.category}`;
-        document.getElementById("md-level").textContent = `Poziom: ${data.level}`;
-        document.getElementById("md-type").textContent = `Typ meczu: ${data.matchType}`;
-        document.getElementById("md-datetime").textContent = `Data: ${data.date} ${data.time}`;
-        if (data.location) {
-          const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(data.location)}`;
-          document.getElementById("md-location").innerHTML = `📍 <a href="${url}" target="_blank">Pokaż na mapie</a> – ${data.location}`;
-        }
-        document.getElementById("md-notes").textContent = `Uwagi: ${data.notes || "-"}`;
-        document.getElementById("details-modal").classList.add("open");
-      }
-
-      document.getElementById("md-close").addEventListener("click", () => document.getElementById("details-modal").classList.remove("open"));
-
       function listenMatches() {
         const q = query(collection(db, "sparingi"), orderBy("date", "desc"));
         onSnapshot(q, (snap) => {
-          const list = [];
-          snap.forEach((d) => list.push({ id: d.id, data: d.data() }));
-          renderList(list);
+          const arr = [];
+          snap.forEach((d) => arr.push({ id: d.id, data: d.data() }));
+          renderMatches(arr);
         });
       }
 
       onAuthStateChanged(auth, async (user) => {
-        if (!user) return (window.location.href = "index.html");
+        if (!user) {
+          window.location.href = "index.html";
+          return;
+        }
         currentUser = user;
         const userRef = doc(db, "users", user.uid);
         const snap = await getDoc(userRef);
         if (snap.exists()) {
           const d = snap.data();
-          currentTeam = d.klub || d.club || "Nieznany klub";
-          teamInput.value = currentTeam;
+          currentClub = d.klub || d.club || "Nieznany klub";
+          teamInput.value = currentClub;
           const raw = d.kategorie || "";
-          const cats = Array.isArray(raw) ? raw : raw.split(",").map((c) => c.trim());
-          categorySelect.innerHTML = cats.map((c) => `<option>${c}</option>`).join("");
+          const arr = Array.isArray(raw) ? raw : raw.split(",").map((c) => c.trim());
+          categorySelect.innerHTML = arr.map((c) => `<option>${c}</option>`).join("");
         }
         listenMatches();
+      });
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const team = teamInput.value;
+        const category = categorySelect.value;
+        const level = levelSelect.value;
+        const date = dateInput.value;
+        const time = timeInput.value;
+        const matchType = matchTypeSelect.value;
+        const location = locationInput.value;
+        const notes = document.getElementById("notes").value;
+
+        const selected = new Date(`${date}T${time}`);
+        if (selected < new Date()) {
+          alert("Nie możesz umawiać sparingu w przeszłości!");
+          return;
+        }
+
+        await addDoc(collection(db, "sparingi"), { team, category, level, date, time, matchType, location, notes, createdAt: new Date() });
+        confirmation.style.display = "block";
+        form.reset();
+        teamInput.value = team;
+        setTimeout(() => (confirmation.style.display = "none"), 3000);
       });
     </script>
   </body>
