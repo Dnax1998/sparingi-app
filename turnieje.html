@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Turnieje – ZgranyTrener.pl</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../style.css" />
+    <link rel="stylesheet" href="../style-profil.css" />
+
+    <style>
+      body {
+        margin: 0;
+        font-family: "Montserrat", sans-serif;
+        background: url("profil/background.jpg") no-repeat center center fixed;
+        background-size: cover;
+        color: #fff;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        text-align: center;
+      }
+
+      header .logo {
+        position: absolute;
+        top: 15px;
+        left: 25px;
+        display: flex;
+        align-items: center;
+      }
+
+      header .logo img {
+        height: 48px;
+      }
+
+      header .logo span {
+        margin-left: 10px;
+        font-weight: 700;
+        font-size: 18px;
+      }
+
+      .message-box {
+        background: rgba(0, 0, 0, 0.6);
+        padding: 40px 60px;
+        border-radius: 20px;
+        box-shadow: 0 0 25px rgba(0, 0, 0, 0.6);
+        max-width: 480px;
+        animation: fadeIn 1s ease-out;
+      }
+
+      h1 {
+        font-size: 32px;
+        margin-bottom: 10px;
+      }
+
+      p {
+        font-size: 18px;
+        opacity: 0.9;
+      }
+
+      .emoji {
+        font-size: 64px;
+        margin-bottom: 16px;
+        display: inline-block;
+        animation: trophySpin 3s infinite linear, pulse 1.5s infinite ease-in-out;
+      }
+
+      a.back-btn {
+        margin-top: 20px;
+        display: inline-block;
+        text-decoration: none;
+        background: #1db954;
+        color: white;
+        padding: 10px 18px;
+        border-radius: 10px;
+        font-weight: 600;
+        transition: 0.2s;
+      }
+
+      a.back-btn:hover {
+        background: #17a445;
+      }
+
+      /* Animacje */
+      @keyframes trophySpin {
+        0% { transform: rotate(0deg); }
+        50% { transform: rotate(5deg); }
+        100% { transform: rotate(0deg); }
+      }
+
+      @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+      }
+
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+    </style>
+  </head>
+
+  <body>
+    <header>
+      <div class="logo">
+        <img src="profil/logo.png" alt="Logo" />
+        <span>ZgranyTrener.pl</span>
+      </div>
+    </header>
+
+    <main>
+      <div class="message-box">
+        <div class="emoji">🏆</div>
+        <h1>Moduł turniejów w przygotowaniu</h1>
+        <p>Trwają prace nad nową sekcją turniejów.<br />Wkrótce będzie dostępna!</p>
+        <a href="dashboard.html" class="back-btn">← Powrót do panelu</a>
+      </div>
+    </main>
+  </body>
+</html>
