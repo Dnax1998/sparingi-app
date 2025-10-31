@@ -206,6 +206,41 @@ div.appendChild(btnDetails);
         });
       });
     });
+    // === MODAL "SZCZEGÓŁY" ===
+
+function openDetails(data) {
+  document.getElementById("md-title").textContent = `📋 Szczegóły: ${data.team || "Nieznany klub"}`;
+  document.getElementById("md-team").innerHTML = `🏟️ <strong>Drużyna:</strong> ${data.team || "-"}`;
+  document.getElementById("md-category").innerHTML = `👶 <strong>Kategoria:</strong> ${data.category || "-"}`;
+  document.getElementById("md-level").innerHTML = `🎯 <strong>Poziom:</strong> ${data.level || "-"}`;
+  document.getElementById("md-type").innerHTML = `⚽ <strong>Typ meczu:</strong> ${data.matchType || "-"}`;
+  document.getElementById("md-datetime").innerHTML = `📅 <strong>Data:</strong> ${data.date || "-"} &nbsp;&nbsp; ⏰ <strong>Godzina:</strong> ${data.time || "-"}`;
+
+  if (data.location) {
+    const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(data.location)}`;
+    document.getElementById("md-location").innerHTML =
+      `📍 <strong>Lokalizacja:</strong> <a href="${url}" target="_blank" rel="noopener" style="color:#0ea5e9;">Zobacz na mapie</a> — ${data.location}`;
+  } else {
+    document.getElementById("md-location").innerHTML = `📍 <strong>Lokalizacja:</strong> brak`;
+  }
+
+  document.getElementById("md-notes").innerHTML = `🗒️ <strong>Uwagi:</strong> ${data.notes || "Brak"}`;
+
+  const modal = document.getElementById("details-modal");
+  modal.classList.add("open");
+  modal.setAttribute("aria-hidden", "false");
+}
+
+// Zamknięcie modala
+const modal = document.getElementById("details-modal");
+document.getElementById("md-close").addEventListener("click", closeModal);
+modal.addEventListener("click", (e) => { if (e.target === modal) closeModal(); });
+
+function closeModal() {
+  modal.classList.remove("open");
+  modal.setAttribute("aria-hidden", "true");
+}
+
   </script>
   <!-- 🔹 MODAL „SZCZEGÓŁY SPARINGU” -->
 <div class="modal" id="details-modal" aria-hidden="true">
@@ -294,6 +329,24 @@ function closeModal() {
 }
 
 </style>
+<!-- MODAL „SZCZEGÓŁY” -->
+<div class="modal" id="details-modal" aria-hidden="true">
+  <div class="modal-card">
+    <h3 id="md-title">📋 Szczegóły sparingu</h3>
+
+    <div class="modal-row" id="md-team"></div>
+    <div class="modal-row" id="md-category"></div>
+    <div class="modal-row" id="md-level"></div>
+    <div class="modal-row" id="md-type"></div>
+    <div class="modal-row" id="md-datetime"></div>
+    <div class="modal-row" id="md-location"></div>
+    <div class="modal-row" id="md-notes"></div>
+
+    <div class="modal-actions">
+      <button class="btn-secondary" id="md-close">Zamknij</button>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>
