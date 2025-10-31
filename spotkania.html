@@ -5,14 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Umawianie sparingu – ZgranyTrener.pl</title>
 
-    <!-- Bazowe style (Twoje pliki) -->
     <link rel="stylesheet" href="../style.css" />
     <link rel="stylesheet" href="../style-profil.css" />
-
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet"/>
 
     <style>
-      /* TŁO I BAZA */
       body {
         margin: 0;
         font-family: "Montserrat", sans-serif;
@@ -41,7 +38,6 @@
         flex-wrap: wrap;
       }
 
-      /* LEWA – LISTA + FILTRY */
       .left-side {
         flex: 1 1 520px;
         min-width: 320px;
@@ -53,26 +49,18 @@
         margin-top: 120px;
       }
 
-      .left-side h2 {
-        margin: 0 0 8px 0;
-        font-size: 28px;
-      }
-      .left-side p { margin-top: 0; }
-
       .filters {
         display: grid;
         grid-template-columns: 1.2fr 0.9fr 0.9fr 0.9fr 1fr;
         gap: 10px;
         margin: 18px 0 20px 0;
       }
-      .filters input,
-      .filters select {
+      .filters input, .filters select {
         padding: 10px 12px;
         border: none;
         border-radius: 10px;
         outline: none;
         font-size: 14px;
-        box-sizing: border-box;
       }
 
       .match-item {
@@ -82,25 +70,38 @@
         border-radius: 12px;
         display: grid;
         grid-template-columns: 1fr auto;
-        gap: 10px;
         align-items: center;
       }
-      .match-main {
-        line-height: 1.45;
+
+      .match-actions {
+        display: flex;
+        gap: 6px;
       }
-      .match-main strong { color: #1db954; }
+
       .match-actions button {
-        background: #0ea5e9;
-        color: #fff;
         border: none;
-        padding: 10px 12px;
-        border-radius: 10px;
+        padding: 8px 10px;
+        border-radius: 8px;
         font-weight: 700;
         cursor: pointer;
       }
-      .match-actions button:hover { filter: brightness(1.05); }
 
-      /* PRAWA – FORMULARZ */
+      .match-actions .details-btn {
+        background: #0ea5e9;
+        color: white;
+      }
+      .match-actions .details-btn:hover {
+        background: #0284c7;
+      }
+
+      .match-actions .accept-btn {
+        background: #dc2626;
+        color: white;
+      }
+      .match-actions .accept-btn:hover {
+        background: #b91c1c;
+      }
+
       .form-container {
         flex: 1 1 420px;
         max-width: 520px;
@@ -113,10 +114,9 @@
       .form-container h1 {
         text-align: center;
         font-size: 28px;
-        margin: 0 0 18px 0;
+        margin-bottom: 18px;
       }
 
-      /* --- KLUCZOWE: zachowaj wygląd pól --- */
       form {
         display: flex;
         flex-direction: column;
@@ -124,7 +124,6 @@
       }
       label {
         font-weight: 600;
-        text-align: left;
         display: block;
         margin-bottom: 5px;
       }
@@ -136,12 +135,11 @@
         font-family: "Montserrat", sans-serif;
         font-size: 15px;
         width: 100%;
-        box-sizing: border-box;
         background: #fff;
         color: #000;
       }
       input[readonly] {
-        background: rgba(255, 255, 255, 0.1);
+        background: rgba(255,255,255,0.1);
         color: #ccc;
         cursor: not-allowed;
       }
@@ -156,18 +154,8 @@
         font-weight: 700;
         font-size: 16px;
         cursor: pointer;
-        transition: 0.2s;
       }
       button:hover { background: #17a445; }
-
-      .back-btn {
-        display: inline-block;
-        margin-top: 14px;
-        color: #fff;
-        text-decoration: none;
-        font-weight: 600;
-        opacity: .9;
-      }
 
       .confirmation {
         background: #1db954;
@@ -178,7 +166,6 @@
         display: none;
       }
 
-      /* MODAL SZCZEGÓŁY */
       .modal {
         position: fixed;
         inset: 0;
@@ -194,7 +181,6 @@
         color: #fff;
         border-radius: 16px;
         padding: 22px;
-        box-shadow: 0 20px 60px rgba(0,0,0,.6);
       }
       .modal-card h3 { margin: 0 0 14px 0; }
       .modal-row { margin: 8px 0; }
@@ -212,10 +198,6 @@
         border-radius: 10px;
         font-weight: 700;
         cursor: pointer;
-      }
-      .btn-light {
-        background: rgba(255,255,255,.1);
-        color: #fff;
       }
 
       @media (max-width: 900px) {
@@ -237,142 +219,56 @@
 
     <main>
       <div class="page-container">
-        <!-- LEWA: OGÓLNE SPARINGI + WYSZUKIWARKA -->
         <section class="left-side">
           <h2>Ogólne sparingi</h2>
           <p>Lista wszystkich sparingów dodanych przez trenerów:</p>
-
-          <div class="filters" id="filters">
+          <div class="filters">
             <input id="f-team" type="text" placeholder="Nazwa drużyny…" />
-            <select id="f-category">
-              <option value="">Kategoria</option>
-              <option>U6</option><option>U7</option><option>U8</option>
-              <option>U9</option><option>U10</option><option>U11</option>
-              <option>U12</option><option>U13</option><option>U14</option>
-              <option>U15</option><option>U16</option><option>U17</option>
-              <option>U18</option><option>U19</option>
-            </select>
-            <select id="f-level">
-              <option value="">Poziom</option>
-              <option>Rekreacja</option>
-              <option>Podstawowy</option>
-              <option>Średniozaawansowany</option>
-              <option>Zaawansowany</option>
-            </select>
+            <select id="f-category"><option value="">Kategoria</option><option>U6</option><option>U7</option><option>U8</option><option>U9</option><option>U10</option><option>U11</option><option>U12</option><option>U13</option><option>U14</option><option>U15</option><option>U16</option><option>U17</option><option>U18</option><option>U19</option></select>
+            <select id="f-level"><option value="">Poziom</option><option>Rekreacja</option><option>Podstawowy</option><option>Średniozaawansowany</option><option>Zaawansowany</option></select>
             <input id="f-date" type="date" />
-            <select id="f-type">
-              <option value="">Typ meczu</option>
-              <option>Domowy</option>
-              <option>Wyjazdowy</option>
-            </select>
+            <select id="f-type"><option value="">Typ meczu</option><option>Domowy</option><option>Wyjazdowy</option></select>
           </div>
-
           <div id="matches-list"></div>
         </section>
 
-        <!-- PRAWA: FORMULARZ -->
         <section class="form-container">
           <h1>Umów sparing</h1>
-
           <form id="match-form">
-            <div>
-              <label for="team">Twoja drużyna</label>
-              <input type="text" id="team" readonly placeholder="Ładowanie nazwy klubu..." />
-            </div>
-
-            <div>
-              <label for="category">Kategoria wiekowa</label>
-              <select id="category" required>
-                <option value="">Wczytywanie…</option>
-              </select>
-            </div>
-
-            <div>
-              <label for="level">Poziom zaawansowania</label>
-              <select id="level" required>
-                <option value="">Wybierz poziom</option>
-                <option value="Rekreacja">Rekreacja</option>
-                <option value="Podstawowy">Podstawowy</option>
-                <option value="Średniozaawansowany">Średniozaawansowany</option>
-                <option value="Zaawansowany">Zaawansowany</option>
-              </select>
-            </div>
-
-            <div>
-              <label for="date">Data sparingu</label>
-              <input type="date" id="date" required />
-            </div>
-
-            <div>
-              <label for="time">Godzina sparingu</label>
-              <input type="time" id="time" required />
-            </div>
-
-            <div>
-              <label for="matchType">Typ meczu</label>
-              <select id="matchType" required>
-                <option value="">Wybierz typ meczu</option>
-                <option value="Domowy">Mecz domowy</option>
-                <option value="Wyjazdowy">Mecz wyjazdowy</option>
-              </select>
-            </div>
-
-            <div>
-              <label for="location">Miejsce</label>
-              <input type="text" id="location" placeholder="Adres lub stadion" />
-            </div>
-
-            <div>
-              <label for="notes">Dodatkowe informacje</label>
-              <textarea id="notes" placeholder="Uwagi (opcjonalne)"></textarea>
-            </div>
-
+            <div><label for="team">Twoja drużyna</label><input type="text" id="team" readonly placeholder="Ładowanie nazwy klubu..." /></div>
+            <div><label for="category">Kategoria wiekowa</label><select id="category" required><option value="">Wczytywanie…</option></select></div>
+            <div><label for="level">Poziom zaawansowania</label><select id="level" required><option value="">Wybierz poziom</option><option value="Rekreacja">Rekreacja</option><option value="Podstawowy">Podstawowy</option><option value="Średniozaawansowany">Średniozaawansowany</option><option value="Zaawansowany">Zaawansowany</option></select></div>
+            <div><label for="date">Data sparingu</label><input type="date" id="date" required /></div>
+            <div><label for="time">Godzina sparingu</label><input type="time" id="time" required /></div>
+            <div><label for="matchType">Typ meczu</label><select id="matchType" required><option value="">Wybierz typ meczu</option><option value="Domowy">Mecz domowy</option><option value="Wyjazdowy">Mecz wyjazdowy</option></select></div>
+            <div><label for="location">Miejsce</label><input type="text" id="location" placeholder="Adres lub stadion" /></div>
+            <div><label for="notes">Dodatkowe informacje</label><textarea id="notes" placeholder="Uwagi (opcjonalne)"></textarea></div>
             <button type="submit">Zapisz sparing</button>
           </form>
-
-          <div class="confirmation" id="confirmation">
-            ✅ Sparing został zapisany!
-          </div>
-
-          <a href="dashboard.html" class="back-btn">← Powrót do dashboardu</a>
+          <div class="confirmation" id="confirmation">✅ Sparing został zapisany!</div>
         </section>
       </div>
     </main>
 
-    <!-- MODAL „SZCZEGÓŁY” -->
-    <div class="modal" id="details-modal" aria-hidden="true">
+    <div class="modal" id="details-modal">
       <div class="modal-card">
         <h3 id="md-title">Szczegóły sparingu</h3>
-        <div class="modal-row" id="md-team"></div>
-        <div class="modal-row" id="md-category"></div>
-        <div class="modal-row" id="md-level"></div>
-        <div class="modal-row" id="md-type"></div>
-        <div class="modal-row" id="md-datetime"></div>
-        <div class="modal-row" id="md-location"></div>
-        <div class="modal-row" id="md-notes"></div>
-        <div class="modal-actions">
-          <button class="btn-secondary" id="md-close">Zamknij</button>
-        </div>
+        <div id="md-team"></div>
+        <div id="md-category"></div>
+        <div id="md-level"></div>
+        <div id="md-type"></div>
+        <div id="md-datetime"></div>
+        <div id="md-location"></div>
+        <div id="md-notes"></div>
+        <div class="modal-actions"><button class="btn-secondary" id="md-close">Zamknij</button></div>
       </div>
     </div>
 
-    <!-- Firebase + logika -->
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
       import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-      import {
-        getFirestore,
-        addDoc,
-        collection,
-        deleteDoc,
-        doc,
-        getDoc,
-        onSnapshot,
-        orderBy,
-        query
-      } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+      import { getFirestore, addDoc, collection, deleteDoc, doc, getDoc, onSnapshot, orderBy, query } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-      // --- KONFIG FIREBASE (Twoja) ---
       const firebaseConfig = {
         apiKey: "AIzaSyBXwR3VojWtQLA6FsXj2pVQsSTWNNAUhb0",
         authDomain: "sparingi-app.firebaseapp.com",
@@ -386,262 +282,90 @@
       const auth = getAuth(app);
       const db = getFirestore(app);
 
-      // DOM
-      const form = document.getElementById("match-form");
-      const confirmation = document.getElementById("confirmation");
       const matchesList = document.getElementById("matches-list");
       const teamInput = document.getElementById("team");
       const categorySelect = document.getElementById("category");
-      const matchTypeSelect = document.getElementById("matchType");
-      const locationInput = document.getElementById("location");
-      const dateInput = document.getElementById("date");
-      const timeInput = document.getElementById("time");
-      const levelSelect = document.getElementById("level");
 
-      // Filtry
-      const fTeam = document.getElementById("f-team");
-      const fCategory = document.getElementById("f-category");
-      const fLevel = document.getElementById("f-level");
-      const fDate = document.getElementById("f-date");
-      const fType = document.getElementById("f-type");
+      let currentUser = null;
+      let currentTeam = "";
 
-      // Modal
-      const modal = document.getElementById("details-modal");
-      const mdTitle = document.getElementById("md-title");
-      const mdTeam = document.getElementById("md-team");
-      const mdCategory = document.getElementById("md-category");
-      const mdLevel = document.getElementById("md-level");
-      const mdType = document.getElementById("md-type");
-      const mdDatetime = document.getElementById("md-datetime");
-      const mdLocation = document.getElementById("md-location");
-      const mdNotes = document.getElementById("md-notes");
-      const mdClose = document.getElementById("md-close");
-
-      let allMatches = []; // cache do filtrowania
-
-      // --- Minimalna data: dziś ---
-      const todayStr = new Date().toISOString().split("T")[0];
-      dateInput.min = todayStr;
-
-      // --- Blokowanie adresu dla wyjazdu ---
-      matchTypeSelect.addEventListener("change", () => {
-        if (matchTypeSelect.value === "Wyjazdowy") {
-          locationInput.value = "";
-          locationInput.setAttribute("readonly", true);
-          locationInput.placeholder = "Adres tylko dla meczów domowych";
-        } else {
-          locationInput.removeAttribute("readonly");
-          locationInput.placeholder = "Adres lub stadion";
-        }
-      });
-
-      // --- Autoczyszczenie przeszłych meczów (wywoływane po każdym update) ---
-      async function cleanOldMatches(matches) {
-        const now = new Date();
-        await Promise.all(
-          matches.map(async (d) => {
-            const m = d.data;
-            if (!m.date) return;
-            const hh = m.time || "00:00";
-            const dt = new Date(`${m.date}T${hh}`);
-            if (dt < now) {
-              try { await deleteDoc(doc(db, "sparingi", d.id)); } catch {}
-            }
-          })
-        );
-      }
-
-      // --- Render listy z uwzględnieniem filtrów ---
-      function applyFilters() {
-        const nameQ = fTeam.value.trim().toLowerCase();
-        const catQ = fCategory.value;
-        const lvlQ = fLevel.value;
-        const dateQ = fDate.value;
-        const typeQ = fType.value;
-
-        const filtered = allMatches.filter(({data}) => {
-          if (nameQ && !(data.team || "").toLowerCase().includes(nameQ)) return false;
-          if (catQ && data.category !== catQ) return false;
-          if (lvlQ && data.level !== lvlQ) return false;
-          if (typeQ && data.matchType !== typeQ) return false;
-          if (dateQ && data.date !== dateQ) return false;
-          return true;
+      async function acceptMatch(id, data) {
+        await addDoc(collection(db, "zaakceptowane_sparingi"), {
+          ...data,
+          acceptedBy: currentUser?.uid || "anon",
+          acceptedTeam: currentTeam,
+          acceptedAt: new Date().toISOString()
         });
-
-        renderList(filtered);
+        await deleteDoc(doc(db, "sparingi", id));
+        alert("✅ Sparing zaakceptowany!");
       }
 
       function renderList(list) {
+        matchesList.innerHTML = "";
         if (!list.length) {
           matchesList.innerHTML = "<p>Brak sparingów.</p>";
           return;
         }
-
-        matchesList.innerHTML = "";
-        list.forEach(({id, data}) => {
-          const wrap = document.createElement("div");
-          wrap.className = "match-item";
-
-          const main = document.createElement("div");
-          main.className = "match-main";
-          main.innerHTML = `
-            <strong>${data.team || "Nieznany klub"}</strong> (${data.category || "-"})<br>
-            🏆 Poziom: ${data.level || "brak"} &nbsp;|&nbsp; 🏁 ${data.matchType || "-"}<br>
-            📅 ${data.date || "-"} &nbsp; ⏰ ${data.time || "-"}<br>
-            ${data.location ? "📍 " + data.location + "<br>" : ""}
-            <small>${data.notes ? data.notes : ""}</small>
+        list.forEach(({ id, data }) => {
+          const div = document.createElement("div");
+          div.className = "match-item";
+          div.innerHTML = `
+            <div>
+              <strong>${data.team}</strong> (${data.category})<br>
+              🏆 Poziom: ${data.level} | 🏁 ${data.matchType}<br>
+              📅 ${data.date} ⏰ ${data.time}<br>
+              ${data.location ? "📍 " + data.location : ""}
+            </div>
+            <div class="match-actions">
+              <button class="details-btn">Szczegóły</button>
+              <button class="accept-btn">Zaakceptuj</button>
+            </div>
           `;
-
-          const actions = document.createElement("div");
-          actions.className = "match-actions";
-          const btn = document.createElement("button");
-          btn.textContent = "Szczegóły";
-          btn.addEventListener("click", () => openDetails(data));
-          actions.appendChild(btn);
-
-          wrap.appendChild(main);
-          wrap.appendChild(actions);
-          matchesList.appendChild(wrap);
+          div.querySelector(".details-btn").addEventListener("click", () => openDetails(data));
+          div.querySelector(".accept-btn").addEventListener("click", () => acceptMatch(id, data));
+          matchesList.appendChild(div);
         });
       }
 
       function openDetails(data) {
-        mdTitle.textContent = `Szczegóły: ${data.team || "Nieznany klub"}`;
-        mdTeam.textContent = `Drużyna: ${data.team || "-"}`;
-        mdCategory.textContent = `Kategoria: ${data.category || "-"}`;
-        mdLevel.textContent = `Poziom: ${data.level || "-"}`;
-        mdType.textContent = `Typ meczu: ${data.matchType || "-"}`;
-        mdDatetime.textContent = `Termin: ${data.date || "-"} ${data.time ? "godz. " + data.time : ""}`;
-
+        document.getElementById("md-title").textContent = `Szczegóły: ${data.team}`;
+        document.getElementById("md-team").textContent = `Drużyna: ${data.team}`;
+        document.getElementById("md-category").textContent = `Kategoria: ${data.category}`;
+        document.getElementById("md-level").textContent = `Poziom: ${data.level}`;
+        document.getElementById("md-type").textContent = `Typ meczu: ${data.matchType}`;
+        document.getElementById("md-datetime").textContent = `Data: ${data.date} ${data.time}`;
         if (data.location) {
           const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(data.location)}`;
-          mdLocation.innerHTML = `Lokalizacja: <a href="${url}" target="_blank" rel="noopener">Pokaż na mapie</a> &nbsp;— ${data.location}`;
-        } else {
-          mdLocation.textContent = "Lokalizacja: -";
+          document.getElementById("md-location").innerHTML = `📍 <a href="${url}" target="_blank">Pokaż na mapie</a> – ${data.location}`;
         }
-        mdNotes.textContent = `Uwagi: ${data.notes || "-"}`;
-
-        modal.classList.add("open");
-        modal.setAttribute("aria-hidden", "false");
+        document.getElementById("md-notes").textContent = `Uwagi: ${data.notes || "-"}`;
+        document.getElementById("details-modal").classList.add("open");
       }
 
-      mdClose.addEventListener("click", closeModal);
-      modal.addEventListener("click", (e) => {
-        if (e.target === modal) closeModal();
-      });
-      function closeModal() {
-        modal.classList.remove("open");
-        modal.setAttribute("aria-hidden", "true");
-      }
+      document.getElementById("md-close").addEventListener("click", () => document.getElementById("details-modal").classList.remove("open"));
 
-      // --- Nasłuch Firestore (auto-refresh) + czyszczenie starych rekordów ---
       function listenMatches() {
-        const qy = query(collection(db, "sparingi"), orderBy("date", "desc"));
-        onSnapshot(qy, async (snap) => {
-          const arr = [];
-          snap.forEach((d) => arr.push({ id: d.id, data: d.data() }));
-          // Autoczyszczenie:
-          await cleanOldMatches(arr);
-
-          // Po ewentualnym czyszczeniu – filtruj/rendery
-          allMatches = arr;
-          applyFilters();
+        const q = query(collection(db, "sparingi"), orderBy("date", "desc"));
+        onSnapshot(q, (snap) => {
+          const list = [];
+          snap.forEach((d) => list.push({ id: d.id, data: d.data() }));
+          renderList(list);
         });
       }
 
-      // --- Ładowanie profilu użytkownika (klub + kategorie) ---
-      async function loadUserProfile(user) {
-        try {
-          const ref = doc(db, "users", user.uid);
-          const s = await getDoc(ref);
-          if (!s.exists()) {
-            teamInput.value = "Nie znaleziono profilu";
-            categorySelect.innerHTML = `<option>Brak kategorii w profilu</option>`;
-            return;
-          }
-          const d = s.data();
-
-          // nazwa klubu
-          const clubName = d.klub || d.club || d.clubName || d.team || "Brak nazwy klubu";
-          teamInput.value = clubName;
-
-          // kategorie
-          const raw = d.kategorie || d.categories || d.kategorie_wiekowe || "";
-          let cats = Array.isArray(raw) ? raw : (typeof raw === "string" ? raw.split(",").map(c=>c.trim()) : []);
-          categorySelect.innerHTML = "";
-          if (cats.length) {
-            cats.forEach(c => {
-              const opt = document.createElement("option");
-              opt.value = c;
-              opt.textContent = c;
-              categorySelect.appendChild(opt);
-            });
-          } else {
-            categorySelect.innerHTML = `<option>Brak kategorii w profilu</option>`;
-          }
-        } catch (e) {
-          teamInput.value = "Błąd ładowania danych";
-        }
-      }
-
-      // --- Rejestracja zdarzeń filtrów ---
-      [fTeam, fCategory, fLevel, fDate, fType].forEach(el => {
-        el.addEventListener("input", applyFilters);
-        el.addEventListener("change", applyFilters);
-      });
-
-      // --- Walidacja daty/godziny (nie przeszłość) przy zapisie ---
-      function isPast(dateStr, timeStr) {
-        const dt = new Date(`${dateStr}T${timeStr || "00:00"}`);
-        const now = new Date();
-        return dt < now;
-      }
-
-      // --- ZAPIS MECZU ---
-      form.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const team = teamInput.value.trim();
-        const category = categorySelect.value;
-        const level = levelSelect.value;
-        const date = dateInput.value;
-        const time = timeInput.value;
-        const matchType = matchTypeSelect.value;
-        const location = locationInput.hasAttribute("readonly") ? "" : locationInput.value.trim();
-        const notes = document.getElementById("notes").value.trim();
-
-        // walidacja daty/godziny
-        if (!date || !time || isPast(date, time)) {
-          alert("Nie możesz umawiać sparingu na przeszły termin.");
-          return;
-        }
-
-        try {
-          await addDoc(collection(db, "sparingi"), {
-            team, category, level, date, time, matchType, location, notes,
-            createdAt: new Date()
-          });
-
-          confirmation.style.display = "block";
-          form.reset();
-          // po resecie przywróć klub:
-          teamInput.value = team;
-          // przywróć placeholder/adres:
-          locationInput.placeholder = "Adres lub stadion";
-          locationInput.removeAttribute("readonly");
-
-          setTimeout(()=> confirmation.style.display="none", 2500);
-        } catch (e) {
-          alert("Błąd zapisu sparingu.");
-        }
-      });
-
-      // --- START: auth + ładowanie + nasłuch listy ---
       onAuthStateChanged(auth, async (user) => {
-        if (!user) {
-          window.location.href = "index.html";
-          return;
+        if (!user) return (window.location.href = "index.html");
+        currentUser = user;
+        const userRef = doc(db, "users", user.uid);
+        const snap = await getDoc(userRef);
+        if (snap.exists()) {
+          const d = snap.data();
+          currentTeam = d.klub || d.club || "Nieznany klub";
+          teamInput.value = currentTeam;
+          const raw = d.kategorie || "";
+          const cats = Array.isArray(raw) ? raw : raw.split(",").map((c) => c.trim());
+          categorySelect.innerHTML = cats.map((c) => `<option>${c}</option>`).join("");
         }
-        await loadUserProfile(user);
         listenMatches();
       });
     </script>
