@@ -190,10 +190,110 @@
             👤 <small>Utworzył: ${data.createdTeam || "-"}</small><br>
             ✅ <small>Zaakceptował: ${data.acceptedTeam || "-"}</small>
           `;
+          // ➕ Dodaj przycisk „Szczegóły”
+const btnDetails = document.createElement("button");
+btnDetails.textContent = "Szczegóły";
+btnDetails.classList.add("btn-secondary");
+btnDetails.style.marginTop = "8px";
+
+// Po kliknięciu otwiera okienko szczegółów
+btnDetails.addEventListener("click", () => openDetails(data));
+
+// Dodaj przycisk do tego meczu
+div.appendChild(btnDetails);
+
           container.appendChild(div);
         });
       });
     });
   </script>
+  <!-- 🔹 MODAL „SZCZEGÓŁY SPARINGU” -->
+<div class="modal" id="details-modal" aria-hidden="true">
+  <div class="modal-card">
+    <h3 id="md-title">Szczegóły sparingu</h3>
+    <div class="modal-row" id="md-team"></div>
+    <div class="modal-row" id="md-category"></div>
+    <div class="modal-row" id="md-level"></div>
+    <div class="modal-row" id="md-type"></div>
+    <div class="modal-row" id="md-datetime"></div>
+    <div class="modal-row" id="md-location"></div>
+    <div class="modal-row" id="md-notes"></div>
+    <div class="modal-actions">
+      <button class="btn-secondary" id="md-close">Zamknij</button>
+    </div>
+  </div>
+</div>
+
+<style>
+  .modal {
+    position: fixed;
+    inset: 0;
+    display: none;
+    place-items: center;
+    background: rgba(0,0,0,.5);
+    z-index: 50;
+  }
+  .modal.open { display: grid; }
+  .modal-card {
+    width: min(560px, 92vw);
+    background: #0b1d14;
+    color: #fff;
+    border-radius: 16px;
+    padding: 22px;
+    box-shadow: 0 20px 60px rgba(0,0,0,.6);
+  }
+  .modal-card h3 { margin: 0 0 14px 0; }
+  .modal-row { margin: 8px 0; }
+  .modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 14px;
+  }
+  .btn-secondary {
+    background: #0ea5e9;
+    color: #fff;
+    border: none;
+    padding: 10px 12px;
+    border-radius: 10px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  // 🔹 Funkcja otwierająca modal
+function openDetails(data) {
+  document.getElementById("md-title").textContent = `Szczegóły: ${data.team || "Nieznany klub"}`;
+  document.getElementById("md-team").textContent = `Drużyna: ${data.team || "-"}`;
+  document.getElementById("md-category").textContent = `Kategoria: ${data.category || "-"}`;
+  document.getElementById("md-level").textContent = `Poziom: ${data.level || "-"}`;
+  document.getElementById("md-type").textContent = `Typ meczu: ${data.matchType || "-"}`;
+  document.getElementById("md-datetime").textContent = `Termin: ${data.date || "-"} ${data.time ? "godz. " + data.time : ""}`;
+
+  if (data.location) {
+    const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(data.location)}`;
+    document.getElementById("md-location").innerHTML =
+      `Lokalizacja: <a href="${url}" target="_blank" rel="noopener">Pokaż na mapie</a> — ${data.location}`;
+  } else {
+    document.getElementById("md-location").textContent = "Lokalizacja: -";
+  }
+
+  document.getElementById("md-notes").textContent = `Uwagi: ${data.notes || "-"}`;
+
+  const modal = document.getElementById("details-modal");
+  modal.classList.add("open");
+  modal.setAttribute("aria-hidden", "false");
+}
+
+// 🔹 Zamknięcie modala
+const modal = document.getElementById("details-modal");
+document.getElementById("md-close").addEventListener("click", closeModal);
+modal.addEventListener("click", (e) => { if (e.target === modal) closeModal(); });
+
+function closeModal() {
+  modal.classList.remove("open");
+  modal.setAttribute("aria-hidden", "true");
+}
+
+</style>
+
 </body>
 </html>
