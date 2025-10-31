@@ -443,7 +443,7 @@
             const m = d.data;
             if (!m.date) return;
             const hh = m.time || "00:00";
-            const dt = new Date(${m.date}T${hh});
+            const dt = new Date(`${m.date}T${hh}`);
             if (dt < now) {
               try { await deleteDoc(doc(db, "sparingi", d.id)); } catch {}
             }
@@ -484,13 +484,13 @@
 
           const main = document.createElement("div");
           main.className = "match-main";
-          main.innerHTML = 
+          main.innerHTML = `
             <strong>${data.team || "Nieznany klub"}</strong> (${data.category || "-"})<br>
             🏆 Poziom: ${data.level || "brak"} &nbsp;|&nbsp; 🏁 ${data.matchType || "-"}<br>
             📅 ${data.date || "-"} &nbsp; ⏰ ${data.time || "-"}<br>
             ${data.location ? "📍 " + data.location + "<br>" : ""}
             <small>${data.notes ? data.notes : ""}</small>
-          ;
+          `;
 
           const actions = document.createElement("div");
           actions.className = "match-actions";
@@ -506,20 +506,20 @@
       }
 
       function openDetails(data) {
-        mdTitle.textContent = Szczegóły: ${data.team || "Nieznany klub"};
-        mdTeam.textContent = Drużyna: ${data.team || "-"};
-        mdCategory.textContent = Kategoria: ${data.category || "-"};
-        mdLevel.textContent = Poziom: ${data.level || "-"};
-        mdType.textContent = Typ meczu: ${data.matchType || "-"};
-        mdDatetime.textContent = Termin: ${data.date || "-"} ${data.time ? "godz. " + data.time : ""};
+        mdTitle.textContent = `Szczegóły: ${data.team || "Nieznany klub"}`;
+        mdTeam.textContent = `Drużyna: ${data.team || "-"}`;
+        mdCategory.textContent = `Kategoria: ${data.category || "-"}`;
+        mdLevel.textContent = `Poziom: ${data.level || "-"}`;
+        mdType.textContent = `Typ meczu: ${data.matchType || "-"}`;
+        mdDatetime.textContent = `Termin: ${data.date || "-"} ${data.time ? "godz. " + data.time : ""}`;
 
         if (data.location) {
-          const url = https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(data.location)};
-          mdLocation.innerHTML = Lokalizacja: <a href="${url}" target="_blank" rel="noopener">Pokaż na mapie</a> &nbsp;— ${data.location};
+          const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(data.location)}`;
+          mdLocation.innerHTML = `Lokalizacja: <a href="${url}" target="_blank" rel="noopener">Pokaż na mapie</a> &nbsp;— ${data.location}`;
         } else {
           mdLocation.textContent = "Lokalizacja: -";
         }
-        mdNotes.textContent = Uwagi: ${data.notes || "-"};
+        mdNotes.textContent = `Uwagi: ${data.notes || "-"}`;
 
         modal.classList.add("open");
         modal.setAttribute("aria-hidden", "false");
@@ -556,7 +556,7 @@
           const s = await getDoc(ref);
           if (!s.exists()) {
             teamInput.value = "Nie znaleziono profilu";
-            categorySelect.innerHTML = <option>Brak kategorii w profilu</option>;
+            categorySelect.innerHTML = `<option>Brak kategorii w profilu</option>`;
             return;
           }
           const d = s.data();
@@ -577,7 +577,7 @@
               categorySelect.appendChild(opt);
             });
           } else {
-            categorySelect.innerHTML = <option>Brak kategorii w profilu</option>;
+            categorySelect.innerHTML = `<option>Brak kategorii w profilu</option>`;
           }
         } catch (e) {
           teamInput.value = "Błąd ładowania danych";
@@ -592,7 +592,7 @@
 
       // --- Walidacja daty/godziny (nie przeszłość) przy zapisie ---
       function isPast(dateStr, timeStr) {
-        const dt = new Date(${dateStr}T${timeStr || "00:00"});
+        const dt = new Date(`${dateStr}T${timeStr || "00:00"}`);
         const now = new Date();
         return dt < now;
       }
