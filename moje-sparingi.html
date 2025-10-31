@@ -149,7 +149,8 @@
       // 📊 pobierz tylko zaakceptowane sparingi przez tego użytkownika
       const q = query(
         collection(db, "zaakceptowane_sparingi"),
-        data.acceptedBy === user.uid || data.createdBy === user.uid
+        where(data.acceptedBy === user.uid || data.createdBy === user.uid)
+
       );
 
       onSnapshot(q, async (snapshot) => {
