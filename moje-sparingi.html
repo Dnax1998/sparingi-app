@@ -1,159 +1,196 @@
-
 <!DOCTYPE html>
 <html lang="pl">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Moje sparingi – ZgranyTrener.pl</title>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Moje sparingi – ZgranyTrener.pl</title>
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../style-profil.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet"/>
 
-    <link rel="stylesheet" href="../style.css" />
-    <link rel="stylesheet" href="../style-profil.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Montserrat", sans-serif;
+      background: url("profil/background.jpg") no-repeat center center fixed;
+      background-size: cover;
+      color: white;
+    }
 
-    <style>
-      body {
-        margin: 0;
-        font-family: "Montserrat", sans-serif;
-        background: url("profil/background.jpg") no-repeat center center fixed;
-        background-size: cover;
-        color: white;
+    header .logo {
+      position: absolute;
+      top: 15px;
+      left: 25px;
+      display: flex;
+      align-items: center;
+    }
+
+    header .logo img { height: 48px; }
+    header .logo span { margin-left: 10px; font-weight: 700; font-size: 18px; }
+
+    main {
+      padding: 100px 5%;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 32px;
+      margin-bottom: 25px;
+    }
+
+    .matches-container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: rgba(0, 0, 0, 0.65);
+      padding: 25px 35px;
+      border-radius: 20px;
+      box-shadow: 0 0 25px rgba(0, 0, 0, 0.6);
+    }
+
+    .match-item {
+      background: rgba(255, 255, 255, 0.08);
+      margin-bottom: 15px;
+      padding: 14px 16px;
+      border-radius: 12px;
+      line-height: 1.6;
+    }
+
+    .match-item strong {
+      color: #1db954;
+    }
+
+    .match-item small {
+      color: #ccc;
+    }
+
+    .no-matches {
+      text-align: center;
+      opacity: 0.8;
+    }
+
+    .footer-link {
+      display: block;
+      text-align: center;
+      margin-top: 25px;
+      color: #fff;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .footer-link:hover {
+      text-decoration: underline;
+    }
+
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <img src="profil/logo.png" alt="Logo" />
+      <span>ZgranyTrener.pl</span>
+    </div>
+  </header>
+
+  <main>
+    <h1>Moje sparingi</h1>
+    <div class="matches-container" id="matches-container">
+      <p class="no-matches">Ładowanie sparingów...</p>
+    </div>
+    <a href="dashboard.html" class="footer-link">← Powrót do panelu</a>
+  </main>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import {
+      getFirestore,
+      collection,
+      query,
+      where,
+      onSnapshot,
+      deleteDoc,
+      doc
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    // --- Konfiguracja Firebase ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyBXwR3VojWtQLA6FsXj2pVQsSTWNNAUhb0",
+      authDomain: "sparingi-app.firebaseapp.com",
+      projectId: "sparingi-app",
+      storageBucket: "sparingi-app.firebasestorage.app",
+      messagingSenderId: "293859421755",
+      appId: "1:293859421755:web:e98887fdc5fb4a79aef61e"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const container = document.getElementById("matches-container");
+
+    // 🔥 Funkcja czyszcząca stare mecze (minione)
+    async function removeOldMatches(matches) {
+      const now = new Date();
+      for (const docSnap of matches) {
+        const d = docSnap.data();
+        const matchDate = new Date(`${d.date}T${d.time || "00:00"}`);
+        if (matchDate < now) {
+          await deleteDoc(doc(db, "zaakceptowane_sparingi", docSnap.id));
+        }
+      }
+    }
+
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        window.location.href = "index.html";
+        return;
       }
 
-      header .logo {
-        position: absolute;
-        top: 15px;
-        left: 25px;
-        display: flex;
-        align-items: center;
-      }
-      header .logo img { height: 48px; }
-      header .logo span { margin-left: 10px; font-weight: 700; font-size: 18px; }
+      // 📊 pobierz tylko zaakceptowane sparingi przez tego użytkownika
+      const q = query(
+        collection(db, "zaakceptowane_sparingi"),
+        where("acceptedBy", "==", user.uid)
+      );
 
-      .page-container {
-        padding: 100px 5%;
-      }
-
-      h1 {
-        text-align: center;
-        margin-bottom: 30px;
-      }
-
-      .match-item {
-        background: rgba(255,255,255,0.08);
-        margin-bottom: 12px;
-        padding: 12px 14px;
-        border-radius: 12px;
-        line-height: 1.5;
-      }
-
-      .match-item strong { color: #1db954; }
-
-      .back-btn {
-        display: block;
-        text-align: center;
-        margin-top: 25px;
-        color: white;
-        text-decoration: none;
-        font-weight: 600;
-      }
-    </style>
-  </head>
-
-  <body>
-    <header>
-      <div class="logo">
-        <img src="profil/logo.png" alt="Logo" />
-        <span>ZgranyTrener.pl</span>
-      </div>
-    </header>
-
-    <main>
-      <div class="page-container">
-        <h1>✅ Moje zaakceptowane sparingi</h1>
-        <div id="my-matches"></div>
-        <a href="spotkania.html" class="back-btn">← Powrót do ogólnych sparingów</a>
-      </div>
-    </main>
-
-    <script type="module">
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-      import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-      import {
-        getFirestore,
-        collection,
-        query,
-        where,
-        onSnapshot
-      } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-      const firebaseConfig = {
-        apiKey: "AIzaSyBXwR3VojWtQLA6FsXj2pVQsSTWNNAUhb0",
-        authDomain: "sparingi-app.firebaseapp.com",
-        projectId: "sparingi-app",
-        storageBucket: "sparingi-app.firebasestorage.app",
-        messagingSenderId: "293859421755",
-        appId: "1:293859421755:web:e98887fdc5fb4a79aef61e"
-      };
-
-      const app = initializeApp(firebaseConfig);
-      const auth = getAuth(app);
-      const db = getFirestore(app);
-
-      const container = document.getElementById("my-matches");
-
-      onAuthStateChanged(auth, async (user) => {
-        if (!user) {
-          window.location.href = "index.html";
+      onSnapshot(q, async (snapshot) => {
+        if (snapshot.empty) {
+          container.innerHTML = `<p class="no-matches">Brak zaakceptowanych sparingów.</p>`;
           return;
         }
 
-        const q = query(collection(db, "zaakceptowane_sparingi"), where("acceptedBy", "==", user.uid));
-      onSnapshot(q, async (snapshot) => {
-  container.innerHTML = "";
+        // usuń zakończone mecze
+        await removeOldMatches(snapshot.docs);
 
-  if (snapshot.empty) {
-    container.innerHTML = "<p>Nie zaakceptowałeś jeszcze żadnych sparingów.</p>";
-    return;
-  }
+        // przefiltruj tylko nadchodzące mecze
+        const now = new Date();
+        const upcoming = snapshot.docs
+          .map((doc) => ({ id: doc.id, data: doc.data() }))
+          .filter(({ data }) => {
+            const matchDate = new Date(`${data.date}T${data.time || "00:00"}`);
+            return matchDate >= now;
+          })
+          .sort((a, b) => new Date(a.data.date) - new Date(b.data.date));
 
-  const now = new Date();
-  const validMatches = [];
+        if (!upcoming.length) {
+          container.innerHTML = `<p class="no-matches">Brak nadchodzących sparingów.</p>`;
+          return;
+        }
 
-  // usuń stare mecze
-  for (const docSnap of snapshot.docs) {
-    const d = docSnap.data();
-    const matchDate = new Date(`${d.date}T${d.time || "00:00"}`);
-
-    if (matchDate < now) {
-      // usuń z bazy zakończone sparingi
-      await deleteDoc(doc(db, "zaakceptowane_sparingi", docSnap.id));
-    } else {
-      validMatches.push(d);
-    }
-  }
-
-  if (!validMatches.length) {
-    container.innerHTML = "<p>Brak nadchodzących sparingów.</p>";
-    return;
-  }
-
-  // wyświetl tylko przyszłe mecze
-  validMatches.sort((a, b) => new Date(a.date) - new Date(b.date));
-  validMatches.forEach((d) => {
-    const div = document.createElement("div");
-    div.classList.add("match-item");
-    div.innerHTML = `
-      <strong>${d.team}</strong> (${d.category || "-"})<br>
-      🏆 ${d.level || "brak"} | ${d.matchType || "-"}<br>
-      📅 ${d.date || "-"} ⏰ ${d.time || "-"}<br>
-      ${d.location ? "📍 " + d.location + "<br>" : ""}
-      <small>${d.notes || ""}</small>
-    `;
-    container.appendChild(div);
-  });
-});
-
+        container.innerHTML = "";
+        upcoming.forEach(({ data }) => {
+          const div = document.createElement("div");
+          div.classList.add("match-item");
+          div.innerHTML = `
+            <strong>${data.team}</strong> (${data.category || "-"})<br>
+            🏆 ${data.level || "brak"} | ${data.matchType || "-"}<br>
+            📅 ${data.date || "-"} ⏰ ${data.time || "-"}<br>
+            ${data.location ? "⚽ " + data.location + "<br>" : ""}
+            <small>${data.notes || ""}</small>
+          `;
+          container.appendChild(div);
+        });
       });
-    </script>
-  </body>
+    });
+  </script>
+</body>
 </html>
