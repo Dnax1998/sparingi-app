@@ -494,10 +494,19 @@
 
           const actions = document.createElement("div");
           actions.className = "match-actions";
-          const btn = document.createElement("button");
-          btn.textContent = "Szczegóły";
-          btn.addEventListener("click", () => openDetails(data));
-          actions.appendChild(btn);
+          // 🔴 Przycisk "Zaakceptuj"
+const acceptBtn = document.createElement("button");
+acceptBtn.textContent = "Zaakceptuj";
+acceptBtn.style.background = "#dc2626"; // czerwony kolor
+acceptBtn.style.marginRight = "6px";
+acceptBtn.addEventListener("click", () => acceptMatch(id, data, currentUser, teamInput.value));
+actions.appendChild(acceptBtn);
+
+// 🔵 Przycisk "Szczegóły"
+const btn = document.createElement("button");
+btn.textContent = "Szczegóły";
+btn.addEventListener("click", () => openDetails(data));
+actions.appendChild(btn);
 
           wrap.appendChild(main);
           wrap.appendChild(actions);
@@ -524,6 +533,26 @@
         modal.classList.add("open");
         modal.setAttribute("aria-hidden", "false");
       }
+// --- Funkcja akceptacji sparingu ---
+async function acceptMatch(id, data, user, clubName) {
+  try {
+    // Dodaj do kolekcji zaakceptowane_sparingi
+    await addDoc(collection(db, "zaakceptowane_sparingi"), {
+      ...data,
+      acceptedBy: user.uid,
+      acceptedTeam: clubName,
+      acceptedAt: new Date().toISOString()
+    });
+
+    // Usuń z listy ogólnej
+    await deleteDoc(doc(db, "sparingi", id));
+
+    alert("✅ Sparing został zaakceptowany!");
+  } catch (e) {
+    alert("Błąd podczas akceptacji sparingu.");
+    console.error(e);
+  }
+}
 
       mdClose.addEventListener("click", closeModal);
       modal.addEventListener("click", (e) => {
@@ -637,6 +666,8 @@
 
       // --- START: auth + ładowanie + nasłuch listy ---
       onAuthStateChanged(auth, async (user) => {
+        window.currentUser = user;
+
         if (!user) {
           window.location.href = "index.html";
           return;
