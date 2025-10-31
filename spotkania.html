@@ -492,46 +492,25 @@
             <small>${data.notes ? data.notes : ""}</small>
           `;
 
-          const actions = document.createElement("div");
-actions.className = "match-actions";
-
-// 🔴 Przycisk akceptacji
+         const actions = document.createElement("div");
+          actions.className = "match-actions";
+          // 🔴 Przycisk "Zaakceptuj"
 const acceptBtn = document.createElement("button");
 acceptBtn.textContent = "Zaakceptuj";
-acceptBtn.style.background = "#e11d48"; // czerwony
-acceptBtn.addEventListener("click", async () => {
-  if (!confirm("Czy na pewno chcesz zaakceptować ten sparing?")) return;
-
-  const user = auth.currentUser;
-  if (!user) {
-    alert("Musisz być zalogowany, aby zaakceptować sparing.");
-    return;
-  }
-
-  try {
-    // przenieś mecz do zaakceptowanych
-    await addDoc(collection(db, "zaakceptowane_sparingi"), {
-      ...data,
-      acceptedBy: user.uid,
-      acceptedAt: new Date()
-    });
-
-    // usuń z ogólnych
-    await deleteDoc(doc(db, "sparingi", id));
-    alert("✅ Sparing został zaakceptowany!");
-  } catch (err) {
-    console.error("Błąd przy akceptacji:", err);
-    alert("Wystąpił błąd przy akceptacji sparingu.");
-  }
-});
-
-// 🔵 Przycisk szczegóły
-const detailsBtn = document.createElement("button");
-detailsBtn.textContent = "Szczegóły";
-detailsBtn.addEventListener("click", () => openDetails(data));
-
+acceptBtn.style.background = "#dc2626"; // czerwony kolor
+acceptBtn.style.marginRight = "6px";
+acceptBtn.addEventListener("click", () => acceptMatch(id, data, currentUser, teamInput.value));
 actions.appendChild(acceptBtn);
-actions.appendChild(detailsBtn);
+
+// 🔵 Przycisk "Szczegóły"
+const btn = document.createElement("button");
+btn.textContent = "Szczegóły";
+btn.addEventListener("click", () => openDetails(data));
+actions.appendChild(btn);
+
+          wrap.appendChild(main);
+          wrap.appendChild(actions);
+          matchesList.appendChild(wrap);
         });
       }
 
