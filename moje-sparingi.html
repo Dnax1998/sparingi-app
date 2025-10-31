@@ -149,7 +149,7 @@
       // 📊 pobierz tylko zaakceptowane sparingi przez tego użytkownika
       const q = query(
         collection(db, "zaakceptowane_sparingi"),
-        where("acceptedBy", "==", user.uid)
+        data.acceptedBy === user.uid || data.createdBy === user.uid
       );
 
       onSnapshot(q, async (snapshot) => {
@@ -186,7 +186,7 @@
             📅 ${data.date || "-"} ⏰ ${data.time || "-"}<br>
             ${data.location ? "⚽ " + data.location + "<br>" : ""}
             <small>${data.notes || ""}</small>
-          `;
+          `;a
           container.appendChild(div);
         });
       });
