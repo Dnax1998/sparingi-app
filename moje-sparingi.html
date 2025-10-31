@@ -108,27 +108,51 @@
         }
 
         const q = query(collection(db, "zaakceptowane_sparingi"), where("acceptedBy", "==", user.uid));
-        onSnapshot(q, (snapshot) => {
-          container.innerHTML = "";
-          if (snapshot.empty) {
-            container.innerHTML = "<p>Nie zaakceptowałeś jeszcze żadnych sparingów.</p>";
-            return;
-          }
+      onSnapshot(q, async (snapshot) => {
+  container.innerHTML = "";
 
-          snapshot.forEach((doc) => {
-            const d = doc.data();
-            const div = document.createElement("div");
-            div.classList.add("match-item");
-            div.innerHTML = `
-              <strong>${d.team}</strong> (${d.category || "-"})<br>
-              🏆 ${d.level || "brak"} | ${d.matchType || "-"}<br>
-              📅 ${d.date || "-"} ⏰ ${d.time || "-"}<br>
-              ${d.location ? "📍 " + d.location + "<br>" : ""}
-              <small>${d.notes || ""}</small>
-            `;
-            container.appendChild(div);
-          });
-        });
+  if (snapshot.empty) {
+    container.innerHTML = "<p>Nie zaakceptowałeś jeszcze żadnych sparingów.</p>";
+    return;
+  }
+
+  const now = new Date();
+  const validMatches = [];
+
+  // usuń stare mecze
+  for (const docSnap of snapshot.docs) {
+    const d = docSnap.data();
+    const matchDate = new Date(`${d.date}T${d.time || "00:00"}`);
+
+    if (matchDate < now) {
+      // usuń z bazy zakończone sparingi
+      await deleteDoc(doc(db, "zaakceptowane_sparingi", docSnap.id));
+    } else {
+      validMatches.push(d);
+    }
+  }
+
+  if (!validMatches.length) {
+    container.innerHTML = "<p>Brak nadchodzących sparingów.</p>";
+    return;
+  }
+
+  // wyświetl tylko przyszłe mecze
+  validMatches.sort((a, b) => new Date(a.date) - new Date(b.date));
+  validMatches.forEach((d) => {
+    const div = document.createElement("div");
+    div.classList.add("match-item");
+    div.innerHTML = `
+      <strong>${d.team}</strong> (${d.category || "-"})<br>
+      🏆 ${d.level || "brak"} | ${d.matchType || "-"}<br>
+      📅 ${d.date || "-"} ⏰ ${d.time || "-"}<br>
+      ${d.location ? "📍 " + d.location + "<br>" : ""}
+      <small>${d.notes || ""}</small>
+    `;
+    container.appendChild(div);
+  });
+});
+
       });
     </script>
   </body>
