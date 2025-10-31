@@ -645,10 +645,13 @@ async function acceptMatch(id, data, user, clubName) {
         }
 
         try {
-          await addDoc(collection(db, "sparingi"), {
-            team, category, level, date, time, matchType, location, notes,
-            createdAt: new Date()
-          });
+        await addDoc(collection(db, "sparingi"), {
+  team, category, level, date, time, matchType, location, notes,
+  createdBy: auth.currentUser.uid,   // 🔹 UID trenera, który tworzy
+  createdTeam: team,                 // 🔹 Nazwa jego drużyny
+  createdAt: new Date()              // 🔹 Data utworzenia
+});
+
 
           confirmation.style.display = "block";
           form.reset();
