@@ -499,7 +499,7 @@ const acceptBtn = document.createElement("button");
 acceptBtn.textContent = "Zaakceptuj";
 acceptBtn.style.background = "#dc2626"; // czerwony kolor
 acceptBtn.style.marginRight = "6px";
-acceptBtn.addEventListener("click", () => acceptMatch(id, data, currentUser, teamInput.value));
+acceptBtn.addEventListener("click", () => acceptMatch(id, data, auth.currentUser, teamInput.value));
 actions.appendChild(acceptBtn);
 
 // 🔵 Przycisk "Szczegóły"
@@ -675,6 +675,26 @@ async function acceptMatch(id, data, user, clubName) {
         await loadUserProfile(user);
         listenMatches();
       });
+      async function acceptMatch(id, data, userName) {
+  try {
+    // dodaj do kolekcji zaakceptowanych sparingów
+    await addDoc(collection(db, "zaakceptowane_sparingi"), {
+      ...data,
+      acceptedBy: auth.currentUser.uid,
+      acceptedTeam: userName,
+      acceptedAt: new Date()
+    });
+
+    // usuń z listy ogólnych sparingów
+    await deleteDoc(doc(db, "sparingi", id));
+
+    alert("✅ Sparing został zaakceptowany!");
+  } catch (e) {
+    console.error("Błąd akceptacji:", e);
+    alert("❌ Nie udało się zaakceptować sparingu.");
+  }
+}
+
     </script>
   </body>
 </html>
