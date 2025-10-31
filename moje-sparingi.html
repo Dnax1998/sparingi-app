@@ -39,7 +39,7 @@
     }
 
     .matches-container {
-      max-width: 800px;
+      max-width: 850px;
       margin: 0 auto;
       background: rgba(0, 0, 0, 0.65);
       padding: 25px 35px;
@@ -80,7 +80,6 @@
     .footer-link:hover {
       text-decoration: underline;
     }
-
   </style>
 </head>
 <body>
@@ -106,13 +105,12 @@
       getFirestore,
       collection,
       query,
-      where,
       onSnapshot,
       deleteDoc,
       doc
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    // --- Konfiguracja Firebase ---
+    // --- KONFIGURACJA FIREBASE ---
     const firebaseConfig = {
       apiKey: "AIzaSyBXwR3VojWtQLA6FsXj2pVQsSTWNNAUhb0",
       authDomain: "sparingi-app.firebaseapp.com",
@@ -128,7 +126,7 @@
 
     const container = document.getElementById("matches-container");
 
-    // 🔥 Funkcja czyszcząca stare mecze (minione)
+    // 🧹 Usuwa sparingi, które są już po terminie
     async function removeOldMatches(matches) {
       const now = new Date();
       for (const docSnap of matches) {
@@ -146,48 +144,52 @@
         return;
       }
 
-      // 📊 pobierz tylko zaakceptowane sparingi przez tego użytkownika
-      const q = query(
-        collection(db, "zaakceptowane_sparingi"),
-        where(data.acceptedBy === user.uid || data.createdBy === user.uid)
-
-      );
+      // 🔥 Pobierz wszystkie zaakceptowane sparingi
+      const q = query(collection(db, "zaakceptowane_sparingi"));
 
       onSnapshot(q, async (snapshot) => {
         if (snapshot.empty) {
-          container.innerHTML = `<p class="no-matches">Brak zaakceptowanych sparingów.</p>`;
+          container.innerHTML = `<p class="no-matches">Brak sparingów.</p>`;
           return;
         }
 
         // usuń zakończone mecze
         await removeOldMatches(snapshot.docs);
 
-        // przefiltruj tylko nadchodzące mecze
         const now = new Date();
-        const upcoming = snapshot.docs
+        const activeMatches = snapshot.docs
           .map((doc) => ({ id: doc.id, data: doc.data() }))
           .filter(({ data }) => {
+            // pokazuj mecze tylko dla trenera który je zaakceptował lub utworzył
+            const isMyMatch =
+              data.acceptedBy === user.uid || data.createdBy === user.uid;
+            if (!isMyMatch) return false;
+
+            // tylko nadchodzące
             const matchDate = new Date(`${data.date}T${data.time || "00:00"}`);
             return matchDate >= now;
           })
           .sort((a, b) => new Date(a.data.date) - new Date(b.data.date));
 
-        if (!upcoming.length) {
+        if (!activeMatches.length) {
           container.innerHTML = `<p class="no-matches">Brak nadchodzących sparingów.</p>`;
           return;
         }
 
+        // render listy
         container.innerHTML = "";
-        upcoming.forEach(({ data }) => {
+        activeMatches.forEach(({ data }) => {
           const div = document.createElement("div");
           div.classList.add("match-item");
           div.innerHTML = `
             <strong>${data.team}</strong> (${data.category || "-"})<br>
-            🏆 ${data.level || "brak"} | ${data.matchType || "-"}<br>
+            🏆 Poziom: ${data.level || "brak"} | 🏁 ${data.matchType || "-"}<br>
             📅 ${data.date || "-"} ⏰ ${data.time || "-"}<br>
             ${data.location ? "⚽ " + data.location + "<br>" : ""}
-            <small>${data.notes || ""}</small>
-          `;a
+            <small>${data.notes || ""}</small><br>
+            👤 <small>Utworzył: ${data.createdTeam || "-"}</small><br>
+            ✅ <small>Zaakceptował: ${data.acceptedTeam || "-"}</small>
+          `;
           container.appendChild(div);
         });
       });
