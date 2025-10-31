@@ -66,10 +66,86 @@
         margin-bottom: 15px;
         padding: 12px;
         border-radius: 10px;
+        position: relative;
       }
 
       .match-item strong {
         color: #1db954;
+      }
+
+      .details-btn {
+        background: #1db954;
+        border: none;
+        color: white;
+        padding: 6px 10px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 14px;
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        transition: 0.2s;
+      }
+
+      .details-btn:hover {
+        background: #17a445;
+      }
+
+      /* 🔹 Modal szczegółów */
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 9999;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        justify-content: center;
+        align-items: center;
+      }
+
+      .modal-content {
+        background: rgba(20, 20, 20, 0.95);
+        padding: 30px;
+        border-radius: 15px;
+        max-width: 600px;
+        width: 90%;
+        color: white;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+        text-align: center;
+        position: relative;
+      }
+
+      .modal-content h2 {
+        color: #1db954;
+        margin-bottom: 20px;
+      }
+
+      .modal-content p {
+        margin: 8px 0;
+        font-size: 16px;
+      }
+
+      .close-btn {
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        font-size: 22px;
+        cursor: pointer;
+        color: #aaa;
+      }
+
+      .close-btn:hover {
+        color: white;
+      }
+
+      #map {
+        margin-top: 15px;
+        width: 100%;
+        height: 250px;
+        border-radius: 10px;
       }
 
       .form-container {
@@ -137,14 +213,6 @@
         background: #17a445;
       }
 
-      .back-btn {
-        display: inline-block;
-        margin-top: 20px;
-        color: white;
-        text-decoration: none;
-        font-weight: 600;
-      }
-
       .confirmation {
         background: #1db954;
         padding: 10px;
@@ -152,40 +220,6 @@
         margin-top: 15px;
         text-align: center;
         display: none;
-      }
-
-      header .logo {
-        position: absolute;
-        top: 15px;
-        left: 25px;
-        display: flex;
-        align-items: center;
-      }
-
-      header .logo img {
-        height: 48px;
-      }
-
-      header .logo span {
-        margin-left: 10px;
-        font-weight: 700;
-        font-size: 18px;
-      }
-
-      @media (max-width: 900px) {
-        .page-container {
-          flex-direction: column;
-          align-items: center;
-        }
-
-        .left-side {
-          width: 100%;
-          height: auto;
-        }
-
-        .form-container {
-          width: 100%;
-        }
       }
     </style>
   </head>
@@ -238,14 +272,12 @@
               <label for="team">Twoja drużyna</label>
               <input type="text" id="team" readonly placeholder="Ładowanie nazwy klubu..." />
             </div>
-
             <div>
               <label for="category">Kategoria wiekowa</label>
               <select id="category" required>
                 <option value="">Wczytywanie...</option>
               </select>
             </div>
-
             <div>
               <label for="level">Poziom zaawansowania</label>
               <select id="level" required>
@@ -256,17 +288,14 @@
                 <option>Zaawansowany</option>
               </select>
             </div>
-
             <div>
               <label for="date">Data sparingu</label>
               <input type="date" id="date" required />
             </div>
-
             <div>
               <label for="time">Godzina sparingu</label>
               <input type="time" id="time" required />
             </div>
-
             <div>
               <label for="matchType">Typ meczu</label>
               <select id="matchType" required>
@@ -275,28 +304,37 @@
                 <option>Wyjazdowy</option>
               </select>
             </div>
-
             <div>
               <label for="location">Miejsce</label>
               <input type="text" id="location" placeholder="Adres lub stadion" required />
             </div>
-
             <div>
               <label for="notes">Dodatkowe informacje</label>
               <textarea id="notes" placeholder="Uwagi (opcjonalne)"></textarea>
             </div>
-
             <button type="submit">Zapisz sparing</button>
           </form>
 
           <div class="confirmation" id="confirmation">
             ✅ Sparing został zapisany!
           </div>
-
-          <a href="dashboard.html" class="back-btn">← Powrót do dashboardu</a>
         </div>
       </div>
     </main>
+
+    <!-- 🆕 Modal szczegółów -->
+    <div id="detailsModal" class="modal">
+      <div class="modal-content">
+        <span class="close-btn">&times;</span>
+        <h2 id="modalTeam"></h2>
+        <p id="modalCategory"></p>
+        <p id="modalLevel"></p>
+        <p id="modalType"></p>
+        <p id="modalDate"></p>
+        <p id="modalLocation"></p>
+        <div id="map"></div>
+      </div>
+    </div>
 
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -326,58 +364,28 @@
       const auth = getAuth(app);
       const db = getFirestore(app);
 
-      const form = document.getElementById("match-form");
       const matchesList = document.getElementById("matches-list");
-      const teamInput = document.getElementById("team");
-      const dateInput = document.getElementById("date");
-      const timeInput = document.getElementById("time");
-      const categorySelect = document.getElementById("category");
-      const levelSelect = document.getElementById("level");
-      const matchTypeSelect = document.getElementById("matchType");
-      const locationInput = document.getElementById("location");
-      const notesInput = document.getElementById("notes");
-      const confirmation = document.getElementById("confirmation");
 
-      // 🔒 Minimalna data (dzisiaj)
-      const today = new Date().toISOString().split("T")[0];
-      dateInput.min = today;
-
-      // 🏠/🚗 Blokowanie pola adresu przy wyjazdowym meczu
-      matchTypeSelect.addEventListener("change", () => {
-        if (matchTypeSelect.value === "Wyjazdowy") {
-          locationInput.value = "";
-          locationInput.setAttribute("readonly", true);
-          locationInput.placeholder = "Adres tylko dla meczów domowych";
-        } else {
-          locationInput.removeAttribute("readonly");
-          locationInput.placeholder = "Adres lub stadion";
-        }
-      });
-
-      // 🧹 Usuwanie przeszłych meczów
+      // 🧹 usuwa przeszłe mecze
       async function cleanOldMatches() {
         const q = query(collection(db, "sparingi"));
         const snapshot = await getDocs(q);
         const now = new Date();
-
         snapshot.forEach(async (docSnap) => {
           const data = docSnap.data();
           if (!data.date) return;
           const matchDate = new Date(`${data.date}T${data.time || "00:00"}`);
-          if (matchDate < now) {
-            await deleteDoc(doc(db, "sparingi", docSnap.id));
-          }
+          if (matchDate < now) await deleteDoc(doc(db, "sparingi", docSnap.id));
         });
       }
 
       let allMatches = [];
 
       async function loadMatches() {
-        await cleanOldMatches(); // 🆕 usuwa przeszłe spotkania
-        matchesList.innerHTML = "<p>Ładowanie sparingów...</p>";
+        await cleanOldMatches();
         const q = query(collection(db, "sparingi"), orderBy("date", "desc"));
         const snapshot = await getDocs(q);
-        allMatches = snapshot.docs.map((d) => d.data());
+        allMatches = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
         renderMatches(allMatches);
       }
 
@@ -393,128 +401,65 @@
           div.classList.add("match-item");
           div.innerHTML = `
             <strong>${data.team}</strong> (${data.category})<br>
-            🏆 Poziom: ${data.level || "brak"}<br>
-            🏠 ${data.matchType}<br>
+            🏆 ${data.level || "brak"} | 🏠 ${data.matchType}<br>
             📅 ${data.date} ⏰ ${data.time || "brak"}<br>
             ${data.location ? "📍 " + data.location + "<br>" : ""}
-            <small>${data.notes || ""}</small>
+            <button class="details-btn" data-id="${data.id}">Szczegóły</button>
           `;
           matchesList.appendChild(div);
         });
-      }
 
-      const searchInputs = document.querySelectorAll(
-        "#searchTeam, #searchCategory, #searchLevel, #searchDate, #searchType"
-      );
-
-      function filterMatches() {
-        const team = document.getElementById("searchTeam").value.toLowerCase();
-        const category = document.getElementById("searchCategory").value;
-        const level = document.getElementById("searchLevel").value;
-        const date = document.getElementById("searchDate").value;
-        const type = document.getElementById("searchType").value;
-
-        const filtered = allMatches.filter((m) => {
-          return (
-            (!team || (m.team && m.team.toLowerCase().includes(team))) &&
-            (!category || m.category === category) &&
-            (!level || m.level === level) &&
-            (!date || m.date === date) &&
-            (!type || m.matchType === type)
-          );
+        document.querySelectorAll(".details-btn").forEach((btn) => {
+          btn.addEventListener("click", (e) => {
+            const id = e.target.dataset.id;
+            const match = allMatches.find((m) => m.id === id);
+            if (match) showDetails(match);
+          });
         });
-
-        renderMatches(filtered);
       }
 
-      searchInputs.forEach((el) => el.addEventListener("input", filterMatches));
-
-      onAuthStateChanged(auth, async (user) => {
-        if (!user) {
-          window.location.href = "index.html";
-          return;
-        }
-
-        try {
-          const userRef = doc(db, "users", user.uid);
-          const userSnap = await getDoc(userRef);
-
-          if (userSnap.exists()) {
-            const data = userSnap.data();
-            const clubName =
-              data.klub || data.club || data.clubName || data.team || "Nieznany klub";
-            teamInput.value = clubName;
-
-            const rawCategories =
-              data.kategorie || data.categories || data.kategorie_wiekowe || "";
-
-            let categories = Array.isArray(rawCategories)
-              ? rawCategories
-              : typeof rawCategories === "string"
-              ? rawCategories.split(",").map((c) => c.trim())
-              : [];
-
-            categorySelect.innerHTML = "";
-            if (categories.length > 0) {
-              categories.forEach((cat) => {
-                const opt = document.createElement("option");
-                opt.value = cat;
-                opt.textContent = cat;
-                categorySelect.appendChild(opt);
-              });
-            } else {
-              const opt = document.createElement("option");
-              opt.textContent = "Brak kategorii w profilu";
-              categorySelect.appendChild(opt);
-            }
-          } else {
-            teamInput.value = "Nie znaleziono profilu użytkownika";
-          }
-        } catch (err) {
-          console.error("Błąd ładowania profilu:", err);
-          teamInput.value = "Błąd ładowania danych";
-        }
-
-        await loadMatches();
+      // 🔹 Modal szczegółów
+      const modal = document.getElementById("detailsModal");
+      const closeModal = document.querySelector(".close-btn");
+      closeModal.addEventListener("click", () => (modal.style.display = "none"));
+      window.addEventListener("click", (e) => {
+        if (e.target === modal) modal.style.display = "none";
       });
 
-      form.addEventListener("submit", async (e) => {
-        e.preventDefault();
+      function showDetails(match) {
+        document.getElementById("modalTeam").textContent = match.team;
+        document.getElementById("modalCategory").textContent =
+          "Rocznik: " + (match.category || "Brak danych");
+        document.getElementById("modalLevel").textContent =
+          "Poziom: " + (match.level || "Brak danych");
+        document.getElementById("modalType").textContent =
+          "Typ meczu: " + (match.matchType || "Brak danych");
+        document.getElementById("modalDate").textContent =
+          "Data: " + match.date + " | Godzina: " + (match.time || "Brak danych");
+        document.getElementById("modalLocation").textContent =
+          "Lokalizacja: " + (match.location || "Brak adresu");
 
-        const team = teamInput.value;
-        const category = categorySelect.value;
-        const level = levelSelect.value;
-        const date = dateInput.value;
-        const time = timeInput.value;
-        const matchType = matchTypeSelect.value;
-        const location = locationInput.value;
-        const notes = notesInput.value;
+        modal.style.display = "flex";
 
-        // 🚫 Blokada przeszłych dat
-        const selectedDateTime = new Date(`${date}T${time || "00:00"}`);
-        const now = new Date();
-        if (selectedDateTime < now) {
-          alert("Nie możesz umawiać sparingu w przeszłości!");
-          return;
+        if (match.location) {
+          const mapFrame = document.createElement("iframe");
+          mapFrame.src = `https://www.google.com/maps?q=${encodeURIComponent(
+            match.location
+          )}&output=embed`;
+          mapFrame.width = "100%";
+          mapFrame.height = "250";
+          mapFrame.style.border = "0";
+          document.getElementById("map").innerHTML = "";
+          document.getElementById("map").appendChild(mapFrame);
+        } else {
+          document.getElementById("map").innerHTML =
+            "<p>Brak lokalizacji do wyświetlenia.</p>";
         }
+      }
 
-        await addDoc(collection(db, "sparingi"), {
-          team,
-          category,
-          level,
-          date,
-          time,
-          matchType,
-          location: matchType === "Wyjazdowy" ? "" : location,
-          notes,
-          createdAt: new Date()
-        });
-
-        confirmation.style.display = "block";
-        form.reset();
-        teamInput.value = team;
+      onAuthStateChanged(auth, async (user) => {
+        if (!user) return (window.location.href = "index.html");
         await loadMatches();
-        setTimeout(() => (confirmation.style.display = "none"), 3000);
       });
     </script>
   </body>
