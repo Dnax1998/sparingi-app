@@ -273,11 +273,21 @@ async function openChat(matchId, data) {
     snap.forEach(doc => {
       const msg = doc.data();
       const msgDiv = document.createElement("div");
-    const senderName = msg.sender === currentUserId 
+   const senderName = msg.sender === currentUserId 
   ? (data.createdTeam || "Twoja drużyna")
   : (data.acceptedTeam || "Przeciwnik");
 
-msgDiv.innerHTML = `<strong>${senderName}:</strong> ${msg.text}`;
+// Formatowanie czasu z Firestore (jeśli jest dostępny)
+let timeString = "";
+if (msg.timestamp && msg.timestamp.seconds) {
+  const date = new Date(msg.timestamp.seconds * 1000);
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  timeString = `${hours}:${minutes}`;
+}
+
+msgDiv.innerHTML = `<strong>${senderName}:</strong> ${msg.text} <span style="color: #bbb; font-size: 0.85em;">(${timeString})</span>`;
+
 
       chatMessages.appendChild(msgDiv);
     });
