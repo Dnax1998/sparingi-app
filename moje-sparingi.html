@@ -292,6 +292,28 @@ chatMessages.appendChild(msgDiv);
 
 chatMessages.scrollTop = chatMessages.scrollHeight;
 });
+  // === obsługa przycisku Wyślij ===
+chatSend.onclick = async () => {
+  const text = chatInput.value.trim();
+  if (text === "") return;
+
+  const msgRef = collection(db, "chats", matchId, "messages");
+  await addDoc(msgRef, {
+    text: text,
+    sender: currentUserId,
+    timestamp: new Date()
+  });
+
+  chatInput.value = ""; // wyczyść pole po wysłaniu
+};
+
+// === wysyłanie Enterem ===
+chatInput.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
+    chatSend.click();
+  }
+});
+
 }
   
 // === 🔔 POWIADOMIENIA O NOWEJ WIADOMOŚCI ===
