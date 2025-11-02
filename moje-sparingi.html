@@ -281,13 +281,16 @@ const chatModal = document.getElementById("chat-modal");
 const chatMessages = document.getElementById("chat-messages");
 const chatInput = document.getElementById("chat-input");
 const chatSend = document.getElementById("chat-send");
+
 let activeWatchId = null;
 let currentUserId = null;
 
-
 async function openChat(matchId, data) {
-activeWatchId = matchId;
-console.log("Opened chat for:", activeWatchId);
+  activeWatchId = matchId;
+  console.log("Opened chat for:", activeWatchId);
+  ...
+}
+
 
 
     // jeśli otwarty był inny chat, przestań go nasłuchiwać
