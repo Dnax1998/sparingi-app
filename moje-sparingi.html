@@ -310,6 +310,13 @@ chatMessages.appendChild(msgDiv);
 
 chatMessages.scrollTop = chatMessages.scrollHeight;
 });
+  // === przycisk WYJDŹ ===
+const chatExit = document.getElementById("chat-exit");
+chatExit.onclick = () => {
+  chatModal.classList.remove("open");
+  chatModal.setAttribute("aria-hidden", "true");
+};
+
   // === obsługa przycisku Wyślij ===
 chatSend.onclick = async () => {
   const text = chatInput.value.trim();
