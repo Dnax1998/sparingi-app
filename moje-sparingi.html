@@ -287,35 +287,38 @@ if (msg.timestamp && msg.timestamp.seconds) {
 }
 
 msgDiv.innerHTML = `<strong>${senderName}:</strong> ${msg.text} <span style="color: #bbb; font-size: 0.85em;">(${timeString})</span>`;
+chatMessages.appendChild(msgDiv);
+});
 
-
-      chatMessages.appendChild(msgDiv);
-    });
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-  });
+chatMessages.scrollTop = chatMessages.scrollHeight;
+});
 }
+  
+// === 🔔 POWIADOMIENIA O NOWEJ WIADOMOŚCI ===
+const bell = document.getElementById("notification-bell");
+const dot = document.getElementById("notif-dot");
 
-chatSend.addEventListener("click", async () => {
-  const text = chatInput.value.trim();
-  if (!text || !activeMatchId) return;
-  await addDoc(collection(db, "chats", activeMatchId, "messages"), {
-    text,
-    sender: currentUserId,
-    timestamp: serverTimestamp()
+onSnapshot(collection(db, "chats"), (snap) => {
+  let newMessage = false;
+  snap.docChanges().forEach(change => {
+    if (change.type === "added") {
+      const msg = change.doc.data();
+      if (msg.sender !== currentUserId) {
+        newMessage = true;
+      }
+    }
   });
-  chatInput.value = "";
+  if (newMessage) {
+    dot.style.display = "block";
+  }
 });
 
-chatModal.addEventListener("click", (e) => {
-  if (e.target === chatModal) chatModal.classList.remove("open");
+bell.addEventListener("click", () => {
+  dot.style.display = "none";
+  alert("💬 Otwórz chat, masz nowe wiadomości!");
 });
-
-onAuthStateChanged(auth, (user) => {
-  if (user) currentUserId = user.uid;
-});
-
-
 </script>
+
 
   <!-- 🔹 MODAL „SZCZEGÓŁY SPARINGU” -->
 <div class="modal" id="details-modal" aria-hidden="true">
@@ -432,6 +435,28 @@ function closeModal() {
       <button id="chat-send" style="background:#1db954; color:#fff; border:none; padding:8px 12px; border-radius:8px;">Wyślij</button>
     </div>
   </div>
+</div>
+<!-- 🔔 DZWONEK POWIADOMIEŃ -->
+<div id="notification-bell" style="
+  position: fixed;
+  top: 15px;
+  right: 20px;
+  font-size: 26px;
+  color: white;
+  cursor: pointer;
+  z-index: 9999;
+">
+  🔔
+  <span id="notif-dot" style="
+    display: none;
+    position: absolute;
+    top: 3px;
+    right: 6px;
+    width: 10px;
+    height: 10px;
+    background-color: red;
+    border-radius: 50%;
+  "></span>
 </div>
 
 </body>
