@@ -226,7 +226,8 @@ chatBtn.textContent = "Chat 💬";
 chatBtn.style.background = "#10b981";
 chatBtn.style.marginLeft = "8px";
 chatBtn.addEventListener("click", () => {
-  const matchId = data.id || data.matchId || `match_${Date.now()}`;
+const matchId = data.id || data.matchId || (data.date ? data.date.replace(/\D/g, "") : "unknown");
+
   openChat(matchId, data);
 });
 
@@ -294,7 +295,9 @@ async function openChat(matchId, data) {
   chatMessages.innerHTML = "<p>Ładowanie wiadomości...</p>";
   chatModal.classList.add("open");
 
-  const q = query(collection(db, "chats", matchId, "messages"), orderBy("timestamp", "asc"));
+  const chatRef = collection(db, "chats", matchId, "messages");
+const q = query(chatRef, orderBy("timestamp", "asc"));
+
   window.activeUnsubscribe = onSnapshot(q, (snap) => {
     chatMessages.innerHTML = "";
     snap.forEach(doc => {
