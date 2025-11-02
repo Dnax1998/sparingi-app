@@ -80,24 +80,6 @@
     .footer-link:hover {
       text-decoration: underline;
     }
-    /* === CHAT – widoczność i animacja === */
-#chat-modal {
-  display: none;
-  position: fixed;
-  bottom: 20px;
-  left: 20px;
-  z-index: 1000;
-}
-#chat-modal.open {
-  display: block;
-  animation: fadeIn 0.3s ease-in-out;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
   </style>
 </head>
 <body>
@@ -225,12 +207,7 @@ const chatBtn = document.createElement("button");
 chatBtn.textContent = "Chat 💬";
 chatBtn.style.background = "#10b981";
 chatBtn.style.marginLeft = "8px";
-chatBtn.addEventListener("click", () => {
-const matchId = data.id || data.matchId || (data.date ? data.date.replace(/\D/g, "") : "unknown");
-
-  openChat(matchId, data);
-});
-
+chatBtn.addEventListener("click", () => openChat(data.id || data.matchId || "unknown", data));
 div.appendChild(chatBtn);
 
           container.appendChild(div);
@@ -282,29 +259,16 @@ const chatMessages = document.getElementById("chat-messages");
 const chatInput = document.getElementById("chat-input");
 const chatSend = document.getElementById("chat-send");
 
-let activeWatchId = null;
+let activeMatchId = null;
 let currentUserId = null;
 
 async function openChat(matchId, data) {
-  activeWatchId = matchId;
-  console.log("Opened chat for:", activeWatchId);
-}
-
-
-
-    // jeśli otwarty był inny chat, przestań go nasłuchiwać
-  if (window.activeUnsubscribe) {
-    window.activeUnsubscribe();
-  }
-
   activeMatchId = matchId;
   chatMessages.innerHTML = "<p>Ładowanie wiadomości...</p>";
   chatModal.classList.add("open");
 
-  const chatRef = collection(db, "chats", matchId, "messages");
-const q = query(chatRef, orderBy("timestamp", "asc"));
-
-  window.activeUnsubscribe = onSnapshot(q, (snap) => {
+  const q = query(collection(db, "chats", matchId, "messages"), orderBy("timestamp", "asc"));
+  onSnapshot(q, (snap) => {
     chatMessages.innerHTML = "";
     snap.forEach(doc => {
       const msg = doc.data();
@@ -323,68 +287,35 @@ if (msg.timestamp && msg.timestamp.seconds) {
 }
 
 msgDiv.innerHTML = `<strong>${senderName}:</strong> ${msg.text} <span style="color: #bbb; font-size: 0.85em;">(${timeString})</span>`;
-chatMessages.appendChild(msgDiv);
-});
 
-chatMessages.scrollTop = chatMessages.scrollHeight;
-});
-  // === przycisk WYJDŹ ===
-const chatExit = document.getElementById("chat-exit");
-chatExit.onclick = () => {
-  chatModal.classList.remove("open");
-  chatModal.setAttribute("aria-hidden", "true");
-};
 
-  // === obsługa przycisku Wyślij ===
-chatSend.onclick = async () => {
-  const text = chatInput.value.trim();
-  if (text === "") return;
-
-  const msgRef = collection(db, "chats", activeWatchId, "messages");
-
-  await addDoc(msgRef, {
-    text: text,
-    sender: currentUserId,
-    timestamp: new Date()
+      chatMessages.appendChild(msgDiv);
+    });
+    chatMessages.scrollTop = chatMessages.scrollHeight;
   });
-
-  chatInput.value = ""; // wyczyść pole po wysłaniu
-};
-
-// === wysyłanie Enterem ===
-chatInput.addEventListener("keydown", (e) => {
-  if (e.key === "Enter") {
-    chatSend.click();
-  }
-});
-
 }
-  
-// === 🔔 POWIADOMIENIA O NOWEJ WIADOMOŚCI ===
-const bell = document.getElementById("notification-bell");
-const dot = document.getElementById("notif-dot");
 
-onSnapshot(collection(db, "chats"), (snap) => {
-  let newMessage = false;
-  snap.docChanges().forEach(change => {
-    if (change.type === "added") {
-      const msg = change.doc.data();
-      if (msg.sender !== currentUserId) {
-        newMessage = true;
-      }
-    }
+chatSend.addEventListener("click", async () => {
+  const text = chatInput.value.trim();
+  if (!text || !activeMatchId) return;
+  await addDoc(collection(db, "chats", activeMatchId, "messages"), {
+    text,
+    sender: currentUserId,
+    timestamp: serverTimestamp()
   });
-  if (newMessage) {
-    dot.style.display = "block";
-  }
+  chatInput.value = "";
 });
 
-bell.addEventListener("click", () => {
-  dot.style.display = "none";
-  alert("🔔 Otwórz chat, masz nowe wiadomości!");
+chatModal.addEventListener("click", (e) => {
+  if (e.target === chatModal) chatModal.classList.remove("open");
+});
+
+onAuthStateChanged(auth, (user) => {
+  if (user) currentUserId = user.uid;
+});
+
+
 </script>
-
-
 
   <!-- 🔹 MODAL „SZCZEGÓŁY SPARINGU” -->
 <div class="modal" id="details-modal" aria-hidden="true">
@@ -492,45 +423,15 @@ function closeModal() {
   </div>
 </div>
 <!-- CHAT MODAL -->
-<div id="chat-modal" aria-hidden="true">
-  <div class="modal-card" style="padding: 15px; border-radius: 10px; background: rgba(0,0,0,0.8);">
-    <div class="chat-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-      <h3 style="margin: 0;">Chat ze sparingu</h3>
-      <button id="chat-exit" style="background: #d9534f; color: white; border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer;">
-        Wyjdź ✖
-      </button>
-    </div>
-
-    <div id="chat-messages" style="height:200px; overflow-y:auto; background:#0b0d14; padding:10px; border-radius:8px; margin-bottom:10px;"></div>
-
+<div class="modal" id="chat-modal" aria-hidden="true">
+  <div class="modal-card">
+    <h3>Chat ze sparingu</h3>
+    <div id="chat-messages" style="height:200px; overflow-y:auto; background:#0b1d14; padding:10px; border-radius:8px; margin-bottom:10px;"></div>
     <div style="display:flex; gap:10px;">
-      <input type="text" id="chat-input" placeholder="Napisz wiadomość..." style="flex:1; padding:8px; border-radius:8px; border:none;">
-      <button id="chat-send" style="background:#10b981; color:#fff; padding:8px 12px; border:none; border-radius:8px;">Wyślij</button>
+      <input type="text" id="chat-input" placeholder="Napisz wiadomość..." style="flex:1; padding:8px; border-radius:8px; border:none;" />
+      <button id="chat-send" style="background:#1db954; color:#fff; border:none; padding:8px 12px; border-radius:8px;">Wyślij</button>
     </div>
   </div>
-</div>
-
-<!-- 🔔 DZWONEK POWIADOMIEŃ -->
-<div id="notification-bell" style="
-  position: fixed;
-  top: 15px;
-  right: 20px;
-  font-size: 26px;
-  color: white;
-  cursor: pointer;
-  z-index: 9999;
-">
-  🔔
-  <span id="notif-dot" style="
-    display: none;
-    position: absolute;
-    top: 3px;
-    right: 6px;
-    width: 10px;
-    height: 10px;
-    background-color: red;
-    border-radius: 50%;
-  "></span>
 </div>
 
 </body>
