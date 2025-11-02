@@ -448,16 +448,24 @@ function closeModal() {
   </div>
 </div>
 <!-- CHAT MODAL -->
-<div class="modal" id="chat-modal" aria-hidden="true">
-  <div class="modal-card">
-    <h3>Chat ze sparingu</h3>
-    <div id="chat-messages" style="height:200px; overflow-y:auto; background:#0b1d14; padding:10px; border-radius:8px; margin-bottom:10px;"></div>
+<div id="chat-modal" aria-hidden="true">
+  <div class="modal-card" style="padding: 15px; border-radius: 10px; background: rgba(0,0,0,0.8);">
+    <div class="chat-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+      <h3 style="margin: 0;">Chat ze sparingu</h3>
+      <button id="chat-exit" style="background: #d9534f; color: white; border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer;">
+        Wyjdź ✖
+      </button>
+    </div>
+
+    <div id="chat-messages" style="height:200px; overflow-y:auto; background:#0b0d14; padding:10px; border-radius:8px; margin-bottom:10px;"></div>
+
     <div style="display:flex; gap:10px;">
-      <input type="text" id="chat-input" placeholder="Napisz wiadomość..." style="flex:1; padding:8px; border-radius:8px; border:none;" />
-      <button id="chat-send" style="background:#1db954; color:#fff; border:none; padding:8px 12px; border-radius:8px;">Wyślij</button>
+      <input type="text" id="chat-input" placeholder="Napisz wiadomość..." style="flex:1; padding:8px; border-radius:8px; border:none;">
+      <button id="chat-send" style="background:#10b981; color:#fff; padding:8px 12px; border:none; border-radius:8px;">Wyślij</button>
     </div>
   </div>
 </div>
+
 <!-- 🔔 DZWONEK POWIADOMIEŃ -->
 <div id="notification-bell" style="
   position: fixed;
