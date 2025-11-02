@@ -285,12 +285,17 @@ let activeMatchId = null;
 let currentUserId = null;
 
 async function openChat(matchId, data) {
+    // jeśli otwarty był inny chat, przestań go nasłuchiwać
+  if (window.activeUnsubscribe) {
+    window.activeUnsubscribe();
+  }
+
   activeMatchId = matchId;
   chatMessages.innerHTML = "<p>Ładowanie wiadomości...</p>";
   chatModal.classList.add("open");
 
   const q = query(collection(db, "chats", matchId, "messages"), orderBy("timestamp", "asc"));
-  onSnapshot(q, (snap) => {
+  window.activeUnsubscribe = onSnapshot(q, (snap) => {
     chatMessages.innerHTML = "";
     snap.forEach(doc => {
       const msg = doc.data();
