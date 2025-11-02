@@ -298,10 +298,12 @@ chatModal.addEventListener("click", (e) => {
 onAuthStateChanged(auth, (user) => {
   if (user) currentUserId = user.uid;
 });
+
+function openChat(id, data) {
+  alert(`Otwieram chat dla sparingu: ${data.team || "Nieznany klub"} (${data.date || "-"})`);
+}
 </script>
 
-
-  </script>
   <!-- 🔹 MODAL „SZCZEGÓŁY SPARINGU” -->
 <div class="modal" id="details-modal" aria-hidden="true">
   <div class="modal-card">
