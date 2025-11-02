@@ -273,7 +273,12 @@ async function openChat(matchId, data) {
     snap.forEach(doc => {
       const msg = doc.data();
       const msgDiv = document.createElement("div");
-      msgDiv.textContent = (msg.sender === currentUserId ? "🟢 Ty: " : "⚪ ") + msg.text;
+    const senderName = msg.sender === currentUserId 
+  ? (data.createdTeam || "Twoja drużyna")
+  : (data.acceptedTeam || "Przeciwnik");
+
+msgDiv.innerHTML = `<strong>${senderName}:</strong> ${msg.text}`;
+
       chatMessages.appendChild(msgDiv);
     });
     chatMessages.scrollTop = chatMessages.scrollHeight;
