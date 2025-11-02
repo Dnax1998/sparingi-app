@@ -334,7 +334,8 @@ chatSend.onclick = async () => {
   const text = chatInput.value.trim();
   if (text === "") return;
 
-  const msgRef = collection(db, "chats", matchId, "messages");
+  const msgRef = collection(db, "chats", activeWatchId, "messages");
+
   await addDoc(msgRef, {
     text: text,
     sender: currentUserId,
