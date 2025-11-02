@@ -199,8 +199,16 @@ btnDetails.style.marginTop = "8px";
 // Po kliknięciu otwiera okienko szczegółów
 btnDetails.addEventListener("click", () => openDetails(data));
 
-// Dodaj przycisk do tego meczu
+// Dodaj przycisk „Szczegóły”
 div.appendChild(btnDetails);
+
+// 🔽 NOWY PRZYCISK CHAT 💬
+const chatBtn = document.createElement("button");
+chatBtn.textContent = "Chat 💬";
+chatBtn.style.background = "#10b981";
+chatBtn.style.marginLeft = "8px";
+chatBtn.addEventListener("click", () => openChat(id, data));
+div.appendChild(chatBtn);
 
           container.appendChild(div);
         });
@@ -240,6 +248,58 @@ function closeModal() {
   modal.classList.remove("open");
   modal.setAttribute("aria-hidden", "true");
 }
+
+// 🔽 CHAT SYSTEM (fragment C)
+import {
+  collection, addDoc, onSnapshot, serverTimestamp, query, orderBy
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const chatModal = document.getElementById("chat-modal");
+const chatMessages = document.getElementById("chat-messages");
+const chatInput = document.getElementById("chat-input");
+const chatSend = document.getElementById("chat-send");
+
+let activeMatchId = null;
+let currentUserId = null;
+
+async function openChat(matchId, data) {
+  activeMatchId = matchId;
+  chatMessages.innerHTML = "<p>Ładowanie wiadomości...</p>";
+  chatModal.classList.add("open");
+
+  const q = query(collection(db, "chats", matchId, "messages"), orderBy("timestamp", "asc"));
+  onSnapshot(q, (snap) => {
+    chatMessages.innerHTML = "";
+    snap.forEach(doc => {
+      const msg = doc.data();
+      const msgDiv = document.createElement("div");
+      msgDiv.textContent = (msg.sender === currentUserId ? "🟢 Ty: " : "⚪ ") + msg.text;
+      chatMessages.appendChild(msgDiv);
+    });
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  });
+}
+
+chatSend.addEventListener("click", async () => {
+  const text = chatInput.value.trim();
+  if (!text || !activeMatchId) return;
+  await addDoc(collection(db, "chats", activeMatchId, "messages"), {
+    text,
+    sender: currentUserId,
+    timestamp: serverTimestamp()
+  });
+  chatInput.value = "";
+});
+
+chatModal.addEventListener("click", (e) => {
+  if (e.target === chatModal) chatModal.classList.remove("open");
+});
+
+onAuthStateChanged(auth, (user) => {
+  if (user) currentUserId = user.uid;
+});
+</script>
+
 
   </script>
   <!-- 🔹 MODAL „SZCZEGÓŁY SPARINGU” -->
@@ -344,6 +404,17 @@ function closeModal() {
 
     <div class="modal-actions">
       <button class="btn-secondary" id="md-close">Zamknij</button>
+    </div>
+  </div>
+</div>
+<!-- CHAT MODAL -->
+<div class="modal" id="chat-modal" aria-hidden="true">
+  <div class="modal-card">
+    <h3>Chat ze sparingu</h3>
+    <div id="chat-messages" style="height:200px; overflow-y:auto; background:#0b1d14; padding:10px; border-radius:8px; margin-bottom:10px;"></div>
+    <div style="display:flex; gap:10px;">
+      <input type="text" id="chat-input" placeholder="Napisz wiadomość..." style="flex:1; padding:8px; border-radius:8px; border:none;" />
+      <button id="chat-send" style="background:#1db954; color:#fff; border:none; padding:8px 12px; border-radius:8px;">Wyślij</button>
     </div>
   </div>
 </div>
