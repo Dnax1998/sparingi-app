@@ -286,6 +286,9 @@ let activeMatchId = null;
 let currentUserId = null;
 
 async function openChat(matchId, data) {
+  activeWatchId = matchId;
+console.log("Opened chat for:", activeWatchId);
+
     // jeśli otwarty był inny chat, przestań go nasłuchiwać
   if (window.activeUnsubscribe) {
     window.activeUnsubscribe();
