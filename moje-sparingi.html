@@ -225,7 +225,11 @@ const chatBtn = document.createElement("button");
 chatBtn.textContent = "Chat 💬";
 chatBtn.style.background = "#10b981";
 chatBtn.style.marginLeft = "8px";
-chatBtn.addEventListener("click", () => openChat(data.id || data.matchId || "unknown", data));
+chatBtn.addEventListener("click", () => {
+  const matchId = data.id || data.matchId || `match_${Date.now()}`;
+  openChat(matchId, data);
+});
+
 div.appendChild(chatBtn);
 
           container.appendChild(div);
