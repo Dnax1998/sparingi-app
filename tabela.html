@@ -3,45 +3,167 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tabela Wyników - Naprawiona</title>
+    <title>Ranking Mistrzów - Podium</title>
     <style>
-        :root { --primary: #1e293b; --accent: #2563eb; --gold: #ffd700; --bg: #f1f5f9; }
-        body { font-family: sans-serif; background: var(--bg); padding: 20px; display: flex; flex-direction: column; align-items: center; }
-        .container { width: 100%; max-width: 900px; }
-        .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
-        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; }
-        input { padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
-        button { padding: 10px; background: var(--accent); color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th { background: var(--primary); color: white; padding: 12px; text-align: left; }
-        td { padding: 10px; border-bottom: 1px solid #ddd; }
-        tr.rank-1 { background-color: rgba(255, 215, 0, 0.2); font-weight: bold; }
-        .edit-input { width: 45px; padding: 5px; }
-        .dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-top: 20px; }
-        .top-card { background: white; padding: 15px; border-radius: 8px; border-left: 5px solid var(--accent); }
+        :root {
+            --primary: #0f172a;
+            --accent: #3b82f6;
+            --gold: #fbbf24;
+            --silver: #94a3b8;
+            --bronze: #a16207;
+            --bg: #f8fafc;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background-color: var(--bg);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container { width: 100%; max-width: 1000px; }
+
+        /* Podium Style */
+        .podium-container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 15px;
+            margin: 40px 0;
+            height: 220px;
+        }
+
+        .podium-place {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 130px;
+        }
+
+        .podium-bar {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: bold;
+            font-size: 28px;
+            border-radius: 10px 10px 0 0;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .name-tag {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-align: center;
+            color: var(--primary);
+            word-break: break-word;
+        }
+
+        .first { order: 2; }
+        .first .podium-bar { height: 150px; background: linear-gradient(to top, #d97706, var(--gold)); border: 2px solid #f59e0b; }
+        
+        .second { order: 1; }
+        .second .podium-bar { height: 110px; background: linear-gradient(to top, #475569, var(--silver)); border: 2px solid #64748b; }
+        
+        .third { order: 3; }
+        .third .podium-bar { height: 80px; background: linear-gradient(to top, #78350f, var(--bronze)); border: 2px solid #92400e; }
+
+        /* Form & Cards */
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+        }
+
+        input {
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            outline: none;
+        }
+
+        input:focus { border-color: var(--accent); }
+
+        button {
+            padding: 12px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* Table */
+        table { width: 100%; border-collapse: collapse; }
+        th { padding: 15px; text-align: left; border-bottom: 2px solid #f1f5f9; color: #64748b; font-size: 12px; text-transform: uppercase; }
+        td { padding: 12px 15px; border-bottom: 1px solid #f1f5f9; }
+
+        .edit-input { width: 50px; padding: 5px; border: 1px solid #cbd5e1; border-radius: 5px; text-align: center; }
+
+        .top-widgets {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .widget { background: white; padding: 15px; border-radius: 12px; border: 1px solid #e2e8f0; }
+        .top-row { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px dashed #eee; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="card">
-        <h2>Dodaj lub Aktualizuj Zawodnika</h2>
-        <div class="form-grid">
-            <input type="text" id="pName" placeholder="Imię i Nazwisko">
-            <input type="number" id="pWins" placeholder="Zwycięstwa" min="0">
-            <input type="number" id="pGoals" placeholder="Gole" min="0">
-            <input type="number" id="pAssists" placeholder="Asysty" min="0">
-            <button id="addBtn">Dodaj Wynik</button>
+    <h2 style="text-align: center;">🏆 Tabela Wyników Drużyny</h2>
+
+    <!-- PODIUM -->
+    <div class="podium-container">
+        <div class="podium-place second">
+            <div class="name-tag" id="p2-name">-</div>
+            <div class="podium-bar">2</div>
+        </div>
+        <div class="podium-place first">
+            <div class="name-tag" id="p1-name">-</div>
+            <div class="podium-bar">1</div>
+        </div>
+        <div class="podium-place third">
+            <div class="name-tag" id="p3-name">-</div>
+            <div class="podium-bar">3</div>
         </div>
     </div>
 
+    <!-- FORMULARZ -->
     <div class="card">
-        <table id="mainTable">
+        <div class="form-grid">
+            <input type="text" id="pName" placeholder="Imię i Nazwisko">
+            <input type="number" id="pWins" placeholder="Zwycięstwa (x3)">
+            <input type="number" id="pGoals" placeholder="Gole (x1)">
+            <input type="number" id="pAssists" placeholder="Asysty (x1)">
+            <button id="addBtn">DODAJ / AKTUALIZUJ</button>
+        </div>
+    </div>
+
+    <!-- TABELA -->
+    <div class="card">
+        <table>
             <thead>
                 <tr>
                     <th>Poz.</th>
                     <th>Zawodnik</th>
-                    <th>Zwyc (x3)</th>
+                    <th>W (x3)</th>
                     <th>Gole</th>
                     <th>Asysty</th>
                     <th>Suma</th>
@@ -52,94 +174,107 @@
         </table>
     </div>
 
-    <div class="dashboard">
-        <div class="top-card"><h3>🔥 TOP Gole</h3><div id="topGoals"></div></div>
-        <div class="top-card"><h3>🎯 TOP Asysty</h3><div id="topAssists"></div></div>
-        <div class="top-card"><h3>🏆 TOP Punkty</h3><div id="topPoints"></div></div>
+    <!-- TOPKI BOCZNE -->
+    <div class="top-widgets">
+        <div class="widget"><h4>⚽ Najwięcej Goli</h4><div id="sideGoals"></div></div>
+        <div class="widget"><h4>🎯 Najwięcej Asyst</h4><div id="sideAssists"></div></div>
     </div>
 </div>
 
 <script>
-    let players = JSON.parse(localStorage.getItem('stats_v2')) || [];
+    // Inicjalizacja danych z pamięci[span_4](start_span)[span_4](end_span)
+    let players = JSON.parse(localStorage.getItem('stats_final_v3')) || [];
 
     function saveAndRender() {
-        localStorage.setItem('stats_v2', JSON.stringify(players));
+        localStorage.setItem('stats_final_v3', JSON.stringify(players));
         render();
     }
 
+    // Obsługa przycisku dodawania[span_5](start_span)[span_5](end_span)
     document.getElementById('addBtn').addEventListener('click', function() {
         const name = document.getElementById('pName').value.trim();
         const wins = parseInt(document.getElementById('pWins').value) || 0;
         const goals = parseInt(document.getElementById('pGoals').value) || 0;
         const assists = parseInt(document.getElementById('pAssists').value) || 0;
 
-        if(!name) { alert("Wpisz imię!"); return; }
+        if(!name) { alert("Wpisz imię zawodnika!"); return; }
 
-        const idx = players.findIndex(p => p.name.toLowerCase() === name.toLowerCase());
-        if(idx > -1) {
-            players[idx].wins += wins;
-            players[idx].goals += goals;
-            players[idx].assists += assists;
+        const existingIdx = players.findIndex(p => p.name.toLowerCase() === name.toLowerCase());
+        
+        if(existingIdx > -1) {
+            players[existingIdx].wins += wins;
+            players[existingIdx].goals += goals;
+            players[existingIdx].assists += assists;
         } else {
             players.push({ name, wins, goals, assists });
         }
 
+        // Czyszczenie pól
         document.getElementById('pName').value = "";
-        document.querySelectorAll('input[type="number"]').forEach(i => i.value = "");
+        document.getElementById('pWins').value = "";
+        document.getElementById('pGoals').value = "";
+        document.getElementById('pAssists').value = "";
+        
         saveAndRender();
     });
 
-    function updateDirect(index, field, val) {
+    function updateDirectly(index, field, val) {
         players[index][field] = parseInt(val) || 0;
         saveAndRender();
     }
 
     function removePlayer(index) {
-        if(confirm("Usunąć?")) {
+        if(confirm("Usunąć zawodnika?")) {
             players.splice(index, 1);
             saveAndRender();
         }
     }
 
     function render() {
-        const sorted = [...players].map(p => ({
+        // Kalkulacja punktów i sortowanie[span_6](start_span)[span_6](end_span)[span_7](start_span)[span_7](end_span)
+        const sortedData = players.map((p, originalIndex) => ({
             ...p,
+            originalIndex,
             total: (p.wins * 3) + p.goals + p.assists
         })).sort((a, b) => b.total - a.total);
 
         const body = document.getElementById('playerBody');
         body.innerHTML = "";
 
-        sorted.forEach((p, i) => {
-            const origIdx = players.findIndex(orig => orig.name === p.name);
+        sortedData.forEach((p, i) => {
             const row = document.createElement('tr');
-            if(i === 0) row.className = 'rank-1';
+            if(i === 0) row.style.backgroundColor = "rgba(251, 191, 36, 0.1)"; // Złote podświetlenie lidera[span_8](start_span)[span_8](end_span)
             
             row.innerHTML = `
-                <td>${i+1}</td>
+                <td><b>${i+1}</b></td>
                 <td>${p.name}</td>
-                <td><input type="number" class="edit-input" value="${p.wins}" onchange="updateDirect(${origIdx}, 'wins', this.value)"></td>
-                <td><input type="number" class="edit-input" value="${p.goals}" onchange="updateDirect(${origIdx}, 'goals', this.value)"></td>
-                <td><input type="number" class="edit-input" value="${p.assists}" onchange="updateDirect(${origIdx}, 'assists', this.value)"></td>
-                <td><strong>${p.total}</strong></td>
-                <td><button onclick="removePlayer(${origIdx})" style="background:#ef4444; font-size:10px;">X</button></td>
+                <td><input type="number" class="edit-input" value="${p.wins}" onchange="updateDirectly(${p.originalIndex}, 'wins', this.value)"></td>
+                <td><input type="number" class="edit-input" value="${p.goals}" onchange="updateDirectly(${p.originalIndex}, 'goals', this.value)"></td>
+                <td><input type="number" class="edit-input" value="${p.assists}" onchange="updateDirectly(${p.originalIndex}, 'assists', this.value)"></td>
+                <td><b style="color:var(--accent)">${p.total}</b></td>
+                <td><button onclick="removePlayer(${p.originalIndex})" style="background:#ef4444; padding:5px 10px; font-size:11px;">Usuń</button></td>
             `;
             body.appendChild(row);
         });
 
-        // Dashboardy
-        const fillTop = (id, field, sortField) => {
-            const top = [...players].map(p => ({...p, total: (p.wins*3)+p.goals+p.assists}))
-                        .sort((a,b) => b[sortField] - a[sortField]).slice(0, 3);
-            document.getElementById(id).innerHTML = top.map((p, idx) => `<div>${idx+1}. ${p.name} (${p[sortField]})</div>`).join('');
-        };
+        // Aktualizacja Podium[span_9](start_span)[span_9](end_span)
+        document.getElementById('p1-name').innerText = sortedData[0] ? sortedData[0].name : "-";
+        document.getElementById('p2-name').innerText = sortedData[1] ? sortedData[1].name : "-";
+        document.getElementById('p3-name').innerText = sortedData[2] ? sortedData[2].name : "-";
 
-        fillTop('topGoals', 'goals', 'goals');
-        fillTop('topAssists', 'assists', 'assists');
-        fillTop('topPoints', 'total', 'total');
+        // Aktualizacja Top Strzelców i Asystentów
+        const updateMini = (id, field) => {
+            const top = [...players].sort((a,b) => b[field] - a[field]).slice(0, 3);
+            document.getElementById(id).innerHTML = top.map(p => `
+                <div class="top-row"><span>${p.name}</span><b>${p[field]}</b></div>
+            `).join('');
+        };
+        updateMini('sideGoals', 'goals');
+        updateMini('sideAssists', 'assists');
     }
 
-    render(); // Start
+    render();
 </script>
+
 </body>
 </html>
