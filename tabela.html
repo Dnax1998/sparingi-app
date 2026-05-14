@@ -3,183 +3,143 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Statystyki Zawodników</title>
+    <title>Tabela Wyników - Naprawiona</title>
     <style>
-        :root {
-            --primary: #2563eb;
-            --bg: #f8fafc;
-            --text: #1e293b;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 900px;
-            background: white;
-            padding: 2rem;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        }
-
-        h2 { text-align: center; color: var(--primary); }
-
-        .input-group {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 10px;
-            margin-bottom: 20px;
-            padding: 15px;
-            background: #f1f5f9;
-            border-radius: 8px;
-        }
-
-        input {
-            padding: 10px;
-            border: 1px solid #cbd5e1;
-            border-radius: 6px;
-            outline: none;
-        }
-
-        input:focus { border-color: var(--primary); }
-
-        button {
-            padding: 10px 20px;
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: opacity 0.2s;
-        }
-
-        button:hover { opacity: 0.9; }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-
-        th {
-            background-color: #e2e8f0;
-            padding: 12px;
-            text-align: left;
-        }
-
-        td {
-            padding: 12px;
-            border-bottom: 1px solid #e2e8f0;
-        }
-
-        tr:hover { background-color: #f8fafc; }
-
-        .total-pts { font-weight: bold; color: var(--primary); }
+        :root { --primary: #1e293b; --accent: #2563eb; --gold: #ffd700; --bg: #f1f5f9; }
+        body { font-family: sans-serif; background: var(--bg); padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .container { width: 100%; max-width: 900px; }
+        .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; }
+        input { padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
+        button { padding: 10px; background: var(--accent); color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th { background: var(--primary); color: white; padding: 12px; text-align: left; }
+        td { padding: 10px; border-bottom: 1px solid #ddd; }
+        tr.rank-1 { background-color: rgba(255, 215, 0, 0.2); font-weight: bold; }
+        .edit-input { width: 45px; padding: 5px; }
+        .dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-top: 20px; }
+        .top-card { background: white; padding: 15px; border-radius: 8px; border-left: 5px solid var(--accent); }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>🏆 Tabela Wyników</h2>
-
-    <div class="input-group">
-        <input type="text" id="name" placeholder="Imię i Nazwisko">
-        <input type="number" id="wins" placeholder="Zwycięstwa" min="0">
-        <input type="number" id="goals" placeholder="Gole" min="0">
-        <input type="number" id="assists" placeholder="Asysty" min="0">
-        <button onclick="addPlayer()">Dodaj Zawodnika</button>
+    <div class="card">
+        <h2>Dodaj lub Aktualizuj Zawodnika</h2>
+        <div class="form-grid">
+            <input type="text" id="pName" placeholder="Imię i Nazwisko">
+            <input type="number" id="pWins" placeholder="Zwycięstwa" min="0">
+            <input type="number" id="pGoals" placeholder="Gole" min="0">
+            <input type="number" id="pAssists" placeholder="Asysty" min="0">
+            <button id="addBtn">Dodaj Wynik</button>
+        </div>
     </div>
 
-    <table id="statsTable">
-        <thead>
-            <tr>
-                <th>Zawodnik</th>
-                <th>Zwycięstwa (x3)</th>
-                <th>Gole (x1)</th>
-                <th>Asysty (x1)</th>
-                <th>Suma Punktów</th>
-                <th>Akcja</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- Tutaj pojawią się dane -->
-        </tbody>
-    </table>
+    <div class="card">
+        <table id="mainTable">
+            <thead>
+                <tr>
+                    <th>Poz.</th>
+                    <th>Zawodnik</th>
+                    <th>Zwyc (x3)</th>
+                    <th>Gole</th>
+                    <th>Asysty</th>
+                    <th>Suma</th>
+                    <th>Opcje</th>
+                </tr>
+            </thead>
+            <tbody id="playerBody"></tbody>
+        </table>
+    </div>
+
+    <div class="dashboard">
+        <div class="top-card"><h3>🔥 TOP Gole</h3><div id="topGoals"></div></div>
+        <div class="top-card"><h3>🎯 TOP Asysty</h3><div id="topAssists"></div></div>
+        <div class="top-card"><h3>🏆 TOP Punkty</h3><div id="topPoints"></div></div>
+    </div>
 </div>
 
 <script>
-    function addPlayer() {
-        const name = document.getElementById('name').value;
-        const wins = parseInt(document.getElementById('wins').value) || 0;
-        const goals = parseInt(document.getElementById('goals').value) || 0;
-        const assists = parseInt(document.getElementById('assists').value) || 0;
+    let players = JSON.parse(localStorage.getItem('stats_v2')) || [];
 
-        if (name === "") {
-            alert("Proszę podać imię i nazwisko!");
-            return;
+    function saveAndRender() {
+        localStorage.setItem('stats_v2', JSON.stringify(players));
+        render();
+    }
+
+    document.getElementById('addBtn').addEventListener('click', function() {
+        const name = document.getElementById('pName').value.trim();
+        const wins = parseInt(document.getElementById('pWins').value) || 0;
+        const goals = parseInt(document.getElementById('pGoals').value) || 0;
+        const assists = parseInt(document.getElementById('pAssists').value) || 0;
+
+        if(!name) { alert("Wpisz imię!"); return; }
+
+        const idx = players.findIndex(p => p.name.toLowerCase() === name.toLowerCase());
+        if(idx > -1) {
+            players[idx].wins += wins;
+            players[idx].goals += goals;
+            players[idx].assists += assists;
+        } else {
+            players.push({ name, wins, goals, assists });
         }
 
-        // Obliczanie punktów: Zwycięstwo * 3 + Gole + Asysty
-        const totalPoints = (wins * 3) + goals + assists;
+        document.getElementById('pName').value = "";
+        document.querySelectorAll('input[type="number"]').forEach(i => i.value = "");
+        saveAndRender();
+    });
 
-        const table = document.getElementById('statsTable').getElementsByTagName('tbody')[0];
-        const newRow = table.insertRow();
-
-        newRow.innerHTML = `
-            <td>${name}</td>
-            <td>${wins}</td>
-            <td>${goals}</td>
-            <td>${assists}</td>
-            <td class="total-pts">${totalPoints}</td>
-            <td><button style="background: #ef4444; padding: 5px 10px;" onclick="deleteRow(this)">Usuń</button></td>
-        `;
-
-        // Sortowanie tabeli po dodaniu (opcjonalnie)
-        sortTable();
-
-        // Czyszczenie pól
-        document.getElementById('name').value = '';
-        document.getElementById('wins').value = '';
-        document.getElementById('goals').value = '';
-        document.getElementById('assists').value = '';
+    function updateDirect(index, field, val) {
+        players[index][field] = parseInt(val) || 0;
+        saveAndRender();
     }
 
-    function deleteRow(btn) {
-        const row = btn.parentNode.parentNode;
-        row.parentNode.removeChild(row);
-    }
-
-    function sortTable() {
-        const table = document.getElementById("statsTable");
-        let switching = true;
-        while (switching) {
-            switching = false;
-            const rows = table.rows;
-            for (let i = 1; i < (rows.length - 1); i++) {
-                let shouldSwitch = false;
-                const x = rows[i].getElementsByTagName("TD")[4];
-                const y = rows[i + 1].getElementsByTagName("TD")[4];
-                if (Number(x.innerHTML) < Number(y.innerHTML)) {
-                    shouldSwitch = true;
-                    break;
-                }
-                if (shouldSwitch) {
-                    rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
-                    switching = true;
-                }
-            }
+    function removePlayer(index) {
+        if(confirm("Usunąć?")) {
+            players.splice(index, 1);
+            saveAndRender();
         }
     }
+
+    function render() {
+        const sorted = [...players].map(p => ({
+            ...p,
+            total: (p.wins * 3) + p.goals + p.assists
+        })).sort((a, b) => b.total - a.total);
+
+        const body = document.getElementById('playerBody');
+        body.innerHTML = "";
+
+        sorted.forEach((p, i) => {
+            const origIdx = players.findIndex(orig => orig.name === p.name);
+            const row = document.createElement('tr');
+            if(i === 0) row.className = 'rank-1';
+            
+            row.innerHTML = `
+                <td>${i+1}</td>
+                <td>${p.name}</td>
+                <td><input type="number" class="edit-input" value="${p.wins}" onchange="updateDirect(${origIdx}, 'wins', this.value)"></td>
+                <td><input type="number" class="edit-input" value="${p.goals}" onchange="updateDirect(${origIdx}, 'goals', this.value)"></td>
+                <td><input type="number" class="edit-input" value="${p.assists}" onchange="updateDirect(${origIdx}, 'assists', this.value)"></td>
+                <td><strong>${p.total}</strong></td>
+                <td><button onclick="removePlayer(${origIdx})" style="background:#ef4444; font-size:10px;">X</button></td>
+            `;
+            body.appendChild(row);
+        });
+
+        // Dashboardy
+        const fillTop = (id, field, sortField) => {
+            const top = [...players].map(p => ({...p, total: (p.wins*3)+p.goals+p.assists}))
+                        .sort((a,b) => b[sortField] - a[sortField]).slice(0, 3);
+            document.getElementById(id).innerHTML = top.map((p, idx) => `<div>${idx+1}. ${p.name} (${p[sortField]})</div>`).join('');
+        };
+
+        fillTop('topGoals', 'goals', 'goals');
+        fillTop('topAssists', 'assists', 'assists');
+        fillTop('topPoints', 'total', 'total');
+    }
+
+    render(); // Start
 </script>
-
 </body>
 </html>
