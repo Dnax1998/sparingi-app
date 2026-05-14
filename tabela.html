@@ -3,59 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ranking SEMP Warszawa</title>
+    <title>Ranking SEMP Warszawa - System</title>
     <style>
         :root {
-            --primary: #c41e3a; /* Czerwień klubowa */
-            --dark: #000000;    /* Czarny klubowy */
-            --accent: #3b82f6;
+            --primary: #c41e3a; /* Czerwień SEMP */
+            --dark: #1a1a1a;
             --gold: #fbbf24;
             --silver: #94a3b8;
             --bronze: #a16207;
-            --bg-glass: rgba(255, 255, 255, 0.9);
+            --bg-glass: rgba(255, 255, 255, 0.92);
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
-            color: #1e293b;
-            position: relative;
             background: #000;
+            color: #1e293b;
+            overflow-x: hidden;
         }
 
-        /* Tło z logo */
+        /* Dynamiczne tło z Twoim obrazem */
         body::before {
             content: "";
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Logo_SEMP_Warszawa.png/600px-Logo_SEMP_Warszawa.png'), 
-                              url('image.png'); /* Próbuje załadować Twój plik lub logo z sieci */
+            background-image: url('IMG_3003.png');
             background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
-            opacity: 0.3;
-            filter: blur(5px);
+            opacity: 0.25; /* Przezroczystość tła */
+            filter: blur(8px);
             z-index: -1;
         }
 
         .container { width: 100%; max-width: 1000px; z-index: 1; }
 
-        /* Nagłówek klubowy */
+        /* Nagłówek */
         .club-header {
             text-align: center;
             margin-bottom: 20px;
             color: white;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.8);
         }
 
-        .club-logo-small {
-            height: 100px;
-            margin-bottom: 10px;
+        .club-logo {
+            height: 120px;
+            margin-bottom: 15px;
+            filter: drop-shadow(0 0 10px rgba(255,255,255,0.3));
         }
 
         /* Podium */
@@ -65,10 +64,10 @@
             align-items: flex-end;
             gap: 15px;
             margin: 30px 0;
-            height: 200px;
+            height: 220px;
         }
 
-        .podium-place { display: flex; flex-direction: column; align-items: center; width: 120px; }
+        .podium-place { display: flex; flex-direction: column; align-items: center; width: 130px; }
         .podium-bar {
             width: 100%;
             display: flex;
@@ -76,56 +75,87 @@
             align-items: center;
             color: white;
             font-weight: bold;
-            font-size: 24px;
-            border-radius: 8px 8px 0 0;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            font-size: 32px;
+            border-radius: 12px 12px 0 0;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
         }
-        .name-tag { font-size: 14px; font-weight: bold; margin-bottom: 8px; color: white; text-align: center; background: rgba(0,0,0,0.6); padding: 2px 8px; border-radius: 10px; }
+        .name-tag { 
+            font-size: 14px; 
+            font-weight: bold; 
+            margin-bottom: 10px; 
+            color: white; 
+            text-align: center; 
+            background: rgba(196, 30, 58, 0.85); 
+            padding: 4px 10px; 
+            border-radius: 12px;
+            max-width: 120px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
         
         .first { order: 2; }
-        .first .podium-bar { height: 130px; background: linear-gradient(to top, #b45309, var(--gold)); border: 2px solid var(--gold); }
+        .first .podium-bar { height: 150px; background: linear-gradient(to top, #b45309, var(--gold)); border: 3px solid var(--gold); }
         .second { order: 1; }
-        .second .podium-bar { height: 90px; background: linear-gradient(to top, #475569, var(--silver)); border: 2px solid var(--silver); }
+        .second .podium-bar { height: 110px; background: linear-gradient(to top, #475569, var(--silver)); border: 3px solid var(--silver); }
         .third { order: 3; }
-        .third .podium-bar { height: 65px; background: linear-gradient(to top, #78350f, var(--bronze)); border: 2px solid var(--bronze); }
+        .third .podium-bar { height: 80px; background: linear-gradient(to top, #78350f, var(--bronze)); border: 3px solid var(--bronze); }
 
-        /* Karty i Formularz */
+        /* Karty */
         .card {
             background: var(--bg-glass);
-            padding: 20px;
-            border-radius: 16px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-            margin-bottom: 20px;
-            backdrop-filter: blur(4px);
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+            margin-bottom: 25px;
         }
 
-        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
-        input { padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-weight: bold; }
-        button { padding: 12px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; }
-        button:hover { background: #9b1a2f; transform: scale(1.02); }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+        input { 
+            padding: 12px; 
+            border: 2px solid #cbd5e1; 
+            border-radius: 10px; 
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+        input:focus { border-color: var(--primary); outline: none; }
+        
+        button { 
+            padding: 12px; 
+            background: var(--primary); 
+            color: white; 
+            border: none; 
+            border-radius: 10px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            transition: all 0.2s;
+        }
+        button:hover { background: #9b1a2f; transform: translateY(-2px); }
 
         /* Tabela */
         table { width: 100%; border-collapse: collapse; }
-        th { padding: 12px; text-align: left; border-bottom: 2px solid var(--primary); color: var(--primary); font-size: 12px; text-transform: uppercase; }
-        td { padding: 10px 12px; border-bottom: 1px solid #ddd; }
-        tr:hover { background: rgba(196, 30, 58, 0.05); }
+        th { padding: 15px; text-align: left; border-bottom: 3px solid var(--primary); color: var(--primary); font-size: 13px; text-transform: uppercase; }
+        td { padding: 12px 15px; border-bottom: 1px solid #e2e8f0; }
+        tr:hover { background: rgba(196, 30, 58, 0.03); }
         
-        .rank-1 { background: rgba(251, 191, 36, 0.15) !important; font-weight: bold; }
-        .edit-input { width: 45px; padding: 5px; border-radius: 4px; border: 1px solid #bbb; text-align: center; font-weight: bold; }
+        .rank-1-row { background: rgba(251, 191, 36, 0.12) !important; font-weight: bold; }
+        .edit-input { width: 50px; padding: 6px; border-radius: 6px; border: 1px solid #94a3b8; text-align: center; font-weight: bold; }
 
-        .widgets { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 15px; }
-        .widget { background: var(--bg-glass); padding: 15px; border-radius: 12px; border-top: 4px solid var(--primary); }
-        .top-row { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px dashed #ccc; }
+        .widgets { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+        .widget { background: var(--bg-glass); padding: 20px; border-radius: 15px; border-top: 5px solid var(--primary); }
+        .top-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed #cbd5e1; }
+        .top-row:last-child { border-bottom: none; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="club-header">
-        <img src="image.png" alt="Logo SEMP" class="club-logo-small" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Logo_SEMP_Warszawa.png/600px-Logo_SEMP_Warszawa.png'">
-        <h1>RANKING SEMP WARSZAWA</h1>
+        <img src="IMG_3003.png" alt="Logo SEMP" class="club-logo">
+        <h1>SEMP WARSZAWA - RANKING</h1>
     </div>
 
+    <!-- WIZUALNE PODIUM -->
     <div class="podium-container">
         <div class="podium-place second">
             <div class="name-tag" id="p2-name">-</div>
@@ -141,54 +171,60 @@
         </div>
     </div>
 
+    <!-- PANEL DODAWANIA -->
     <div class="card">
         <div class="form-grid">
             <input type="text" id="pName" placeholder="Imię i Nazwisko">
-            <input type="number" id="pWins" placeholder="Wygrane (3pkt)">
+            <input type="number" id="pWins" placeholder="Zwycięstwa (3pkt)">
             <input type="number" id="pGoals" placeholder="Gole (1pkt)">
             <input type="number" id="pAssists" placeholder="Asysty (1pkt)">
-            <button id="addBtn">DODAJ DANE</button>
+            <button id="addBtn">ZAPISZ WYNIK</button>
         </div>
     </div>
 
+    <!-- TABELA GŁÓWNA -->
     <div class="card" style="overflow-x: auto;">
         <table>
             <thead>
                 <tr>
                     <th>Poz.</th>
                     <th>Zawodnik</th>
-                    <th>Zwyc</th>
-                    <th>Gole</th>
-                    <th>Asysty</th>
-                    <th>Punkty</th>
-                    <th>Usuń</th>
+                    <th>Zwyc (x3)</th>
+                    <th>Gole (x1)</th>
+                    <th>Asysty (x1)</th>
+                    <th>Suma</th>
+                    <th>Akcja</th>
                 </tr>
             </thead>
             <tbody id="playerBody"></tbody>
         </table>
     </div>
 
+    <!-- TOP 3 KATEGORIE -->
     <div class="widgets">
-        <div class="widget"><h4>⚽ Najlepsi Strzelcy</h4><div id="sideGoals"></div></div>
+        <div class="widget"><h4>🔥 Król Strzelców</h4><div id="sideGoals"></div></div>
         <div class="widget"><h4>🎯 Najlepsi Asystenci</h4><div id="sideAssists"></div></div>
     </div>
 </div>
 
 <script>
-    let players = JSON.parse(localStorage.getItem('semp_stats_v1')) || [];
+    // System zapisu w LocalStorage[span_0](start_span)[span_0](end_span)[span_1](start_span)[span_1](end_span)
+    let players = JSON.parse(localStorage.getItem('semp_final_data')) || [];
 
     function saveAndRender() {
-        localStorage.setItem('semp_stats_v1', JSON.stringify(players));
+        localStorage.setItem('semp_final_data', JSON.stringify(players));
         render();
     }
 
+    // Dodawanie/Aktualizacja danych[span_2](start_span)[span_2](end_span)
     document.getElementById('addBtn').addEventListener('click', function() {
-        const name = document.getElementById('pName').value.trim();
+        const nameInput = document.getElementById('pName');
+        const name = nameInput.value.trim();
         const wins = parseInt(document.getElementById('pWins').value) || 0;
         const goals = parseInt(document.getElementById('pGoals').value) || 0;
         const assists = parseInt(document.getElementById('pAssists').value) || 0;
 
-        if(!name) return;
+        if(!name) { alert("Podaj nazwisko zawodnika!"); return; }
 
         const idx = players.findIndex(p => p.name.toLowerCase() === name.toLowerCase());
         if(idx > -1) {
@@ -199,7 +235,8 @@
             players.push({ name, wins, goals, assists });
         }
 
-        document.querySelectorAll('input').forEach(i => i.value = "");
+        nameInput.value = "";
+        document.querySelectorAll('input[type="number"]').forEach(i => i.value = "");
         saveAndRender();
     });
 
@@ -209,13 +246,14 @@
     }
 
     function removeP(index) {
-        if(confirm("Usunąć zawodnika?")) {
+        if(confirm("Czy na pewno chcesz usunąć tego zawodnika?")) {
             players.splice(index, 1);
             saveAndRender();
         }
     }
 
     function render() {
+        // Obliczanie punktów: Zwycięstwa*3 + Gole + Asysty[span_3](start_span)[span_3](end_span)[span_4](start_span)[span_4](end_span)
         const sorted = players.map((p, i) => ({
             ...p, 
             originalIndex: i,
@@ -227,30 +265,30 @@
 
         sorted.forEach((p, i) => {
             const row = document.createElement('tr');
-            if(i === 0) row.className = 'rank-1';
+            if(i === 0) row.className = 'rank-1-row';
             row.innerHTML = `
-                <td>${i+1}</td>
+                <td><b>${i+1}</b></td>
                 <td>${p.name}</td>
                 <td><input type="number" class="edit-input" value="${p.wins}" onchange="updateVal(${p.originalIndex}, 'wins', this.value)"></td>
                 <td><input type="number" class="edit-input" value="${p.goals}" onchange="updateVal(${p.originalIndex}, 'goals', this.value)"></td>
                 <td><input type="number" class="edit-input" value="${p.assists}" onchange="updateVal(${p.originalIndex}, 'assists', this.value)"></td>
-                <td style="color:var(--primary); font-weight:bold;">${p.total}</td>
-                <td><button onclick="removeP(${p.originalIndex})" style="background:#444; padding:2px 8px;">X</button></td>
+                <td style="color:var(--primary); font-weight:bold; font-size:16px;">${p.total}</td>
+                <td><button onclick="removeP(${p.originalIndex})" style="background:#475569; padding:4px 10px; font-size:11px;">USUŃ</button></td>
             `;
             body.appendChild(row);
         });
 
-        // Podium
+        // Obsługa Podium[span_5](start_span)[span_5](end_span)
         document.getElementById('p1-name').innerText = sorted[0] ? sorted[0].name : "-";
         document.getElementById('p2-name').innerText = sorted[1] ? sorted[1].name : "-";
         document.getElementById('p3-name').innerText = sorted[2] ? sorted[2].name : "-";
 
-        // Widgety
+        // Widgety TOP 3
         const fill = (id, field) => {
             const top = [...players].sort((a,b) => b[field] - a[field]).slice(0, 3);
-            document.getElementById(id).innerHTML = top.map(p => `
+            document.getElementById(id).innerHTML = top.length ? top.map(p => `
                 <div class="top-row"><span>${p.name}</span><b>${p[field]}</b></div>
-            `).join('');
+            `).join('') : "Brak danych";
         };
         fill('sideGoals', 'goals');
         fill('sideAssists', 'assists');
