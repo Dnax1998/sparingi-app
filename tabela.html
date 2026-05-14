@@ -3,10 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SEMP WARSZAWA 2016</title>
+    <title>Ranking SEMP Warszawa - Live Database</title>
+    
+    <!-- Skrypty Firebase (Legacy SDK dla prostoty implementacji) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
     <style>
         :root {
-            --primary: #c41e3a; /* Czerwień SEMP */
+            --primary: #c41e3a;
             --dark: #1a1a1a;
             --gold: #fbbf24;
             --silver: #94a3b8;
@@ -15,7 +20,7 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', sans-serif;
             margin: 0;
             padding: 20px;
             display: flex;
@@ -24,10 +29,8 @@
             min-height: 100vh;
             background: #000;
             color: #1e293b;
-            overflow-x: hidden;
         }
 
-        /* Dynamiczne tło z Twoim obrazem */
         body::before {
             content: "";
             position: fixed;
@@ -36,26 +39,15 @@
             background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
-            opacity: 0.25; /* Przezroczystość tła */
+            opacity: 0.25;
             filter: blur(8px);
             z-index: -1;
         }
 
         .container { width: 100%; max-width: 1000px; z-index: 1; }
 
-        /* Nagłówek */
-        .club-header {
-            text-align: center;
-            margin-bottom: 20px;
-            color: white;
-            text-shadow: 2px 2px 8px rgba(0,0,0,0.8);
-        }
-
-        .club-logo {
-            height: 120px;
-            margin-bottom: 15px;
-            filter: drop-shadow(0 0 10px rgba(255,255,255,0.3));
-        }
+        .club-header { text-align: center; margin-bottom: 20px; color: white; text-shadow: 2px 2px 8px rgba(0,0,0,0.8); }
+        .club-logo { height: 120px; margin-bottom: 15px; }
 
         /* Podium */
         .podium-container {
@@ -66,7 +58,6 @@
             margin: 30px 0;
             height: 220px;
         }
-
         .podium-place { display: flex; flex-direction: column; align-items: center; width: 130px; }
         .podium-bar {
             width: 100%;
@@ -80,20 +71,9 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.4);
         }
         .name-tag { 
-            font-size: 14px; 
-            font-weight: bold; 
-            margin-bottom: 10px; 
-            color: white; 
-            text-align: center; 
-            background: rgba(196, 30, 58, 0.85); 
-            padding: 4px 10px; 
-            border-radius: 12px;
-            max-width: 120px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            font-size: 14px; font-weight: bold; margin-bottom: 10px; color: white; 
+            background: rgba(196, 30, 58, 0.85); padding: 4px 10px; border-radius: 12px;
         }
-        
         .first { order: 2; }
         .first .podium-bar { height: 150px; background: linear-gradient(to top, #b45309, var(--gold)); border: 3px solid var(--gold); }
         .second { order: 1; }
@@ -102,49 +82,19 @@
         .third .podium-bar { height: 80px; background: linear-gradient(to top, #78350f, var(--bronze)); border: 3px solid var(--bronze); }
 
         /* Karty */
-        .card {
-            background: var(--bg-glass);
-            padding: 25px;
-            border-radius: 20px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
-            margin-bottom: 25px;
-        }
-
+        .card { background: var(--bg-glass); padding: 25px; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.4); margin-bottom: 25px; }
         .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
-        input { 
-            padding: 12px; 
-            border: 2px solid #cbd5e1; 
-            border-radius: 10px; 
-            font-size: 14px;
-            transition: border-color 0.2s;
-        }
-        input:focus { border-color: var(--primary); outline: none; }
+        input { padding: 12px; border: 2px solid #cbd5e1; border-radius: 10px; }
+        button { padding: 12px; background: var(--primary); color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; }
         
-        button { 
-            padding: 12px; 
-            background: var(--primary); 
-            color: white; 
-            border: none; 
-            border-radius: 10px; 
-            font-weight: bold; 
-            cursor: pointer; 
-            transition: all 0.2s;
-        }
-        button:hover { background: #9b1a2f; transform: translateY(-2px); }
-
         /* Tabela */
         table { width: 100%; border-collapse: collapse; }
         th { padding: 15px; text-align: left; border-bottom: 3px solid var(--primary); color: var(--primary); font-size: 13px; text-transform: uppercase; }
         td { padding: 12px 15px; border-bottom: 1px solid #e2e8f0; }
-        tr:hover { background: rgba(196, 30, 58, 0.03); }
-        
-        .rank-1-row { background: rgba(251, 191, 36, 0.12) !important; font-weight: bold; }
-        .edit-input { width: 50px; padding: 6px; border-radius: 6px; border: 1px solid #94a3b8; text-align: center; font-weight: bold; }
+        .edit-input { width: 50px; padding: 6px; border-radius: 6px; border: 1px solid #94a3b8; text-align: center; }
 
         .widgets { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
         .widget { background: var(--bg-glass); padding: 20px; border-radius: 15px; border-top: 5px solid var(--primary); }
-        .top-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed #cbd5e1; }
-        .top-row:last-child { border-bottom: none; }
     </style>
 </head>
 <body>
@@ -152,23 +102,14 @@
 <div class="container">
     <div class="club-header">
         <img src="IMG_3003.png" alt="Logo SEMP" class="club-logo">
-        <h1>SEMP WARSZAWA 2016</h1>
+        <h1>SEMP WARSZAWA - LIVE RANKING</h1>
     </div>
 
-    <!-- WIZUALNE PODIUM -->
+    <!-- PODIUM -->
     <div class="podium-container">
-        <div class="podium-place second">
-            <div class="name-tag" id="p2-name">-</div>
-            <div class="podium-bar">2</div>
-        </div>
-        <div class="podium-place first">
-            <div class="name-tag" id="p1-name">-</div>
-            <div class="podium-bar">1</div>
-        </div>
-        <div class="podium-place third">
-            <div class="name-tag" id="p3-name">-</div>
-            <div class="podium-bar">3</div>
-        </div>
+        <div class="podium-place second"><div class="name-tag" id="p2-name">-</div><div class="podium-bar">2</div></div>
+        <div class="podium-place first"><div class="name-tag" id="p1-name">-</div><div class="podium-bar">1</div></div>
+        <div class="podium-place third"><div class="name-tag" id="p3-name">-</div><div class="podium-bar">3</div></div>
     </div>
 
     <!-- PANEL DODAWANIA -->
@@ -178,20 +119,20 @@
             <input type="number" id="pWins" placeholder="Zwycięstwa (3pkt)">
             <input type="number" id="pGoals" placeholder="Gole (1pkt)">
             <input type="number" id="pAssists" placeholder="Asysty (1pkt)">
-            <button id="addBtn">ZAPISZ WYNIK</button>
+            <button onclick="addOrUpdatePlayer()">ZAPISZ W CHMURZE</button>
         </div>
     </div>
 
-    <!-- TABELA GŁÓWNA -->
+    <!-- TABELA -->
     <div class="card" style="overflow-x: auto;">
         <table>
             <thead>
                 <tr>
                     <th>Poz.</th>
                     <th>Zawodnik</th>
-                    <th>Zwyc (x3)</th>
-                    <th>Gole (x1)</th>
-                    <th>Asysty (x1)</th>
+                    <th>W (x3)</th>
+                    <th>G (x1)</th>
+                    <th>A (x1)</th>
                     <th>Suma</th>
                     <th>Akcja</th>
                 </tr>
@@ -200,7 +141,6 @@
         </table>
     </div>
 
-    <!-- TOP 3 KATEGORIE -->
     <div class="widgets">
         <div class="widget"><h4>🔥 Król Strzelców</h4><div id="sideGoals"></div></div>
         <div class="widget"><h4>🎯 Najlepsi Asystenci</h4><div id="sideAssists"></div></div>
@@ -208,93 +148,102 @@
 </div>
 
 <script>
-    // System zapisu w LocalStorage[span_0](start_span)[span_0](end_span)[span_1](start_span)[span_1](end_span)
-    let players = JSON.parse(localStorage.getItem('semp_final_data')) || [];
+    // ========== KONFIGURACJA FIREBASE ==========
+    const firebaseConfig = {
+        apiKey: "AIzaSyAbMTVozOhIXesvF59REYnIOtmo-V5qimk",
+        authDomain: "forevermagazyn.firebaseapp.com",
+        projectId: "forevermagazyn",
+        storageBucket: "forevermagazyn.firebasestorage.app",
+        messagingSenderId: "251843942343",
+        appId: "1:251843942343:web:2c81227b12ab4ad0052be2"
+    };
 
-    function saveAndRender() {
-        localStorage.setItem('semp_final_data', JSON.stringify(players));
-        render();
-    }
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const playersCol = db.collection('players');
 
-    // Dodawanie/Aktualizacja danych[span_2](start_span)[span_2](end_span)
-    document.getElementById('addBtn').addEventListener('click', function() {
-        const nameInput = document.getElementById('pName');
-        const name = nameInput.value.trim();
+    // Funkcja dodawania / aktualizacji[span_4](start_span)[span_4](end_span)
+    async function addOrUpdatePlayer() {
+        const name = document.getElementById('pName').value.trim();
         const wins = parseInt(document.getElementById('pWins').value) || 0;
         const goals = parseInt(document.getElementById('pGoals').value) || 0;
         const assists = parseInt(document.getElementById('pAssists').value) || 0;
 
-        if(!name) { alert("Podaj nazwisko zawodnika!"); return; }
+        if (!name) return alert("Podaj nazwisko!");
 
-        const idx = players.findIndex(p => p.name.toLowerCase() === name.toLowerCase());
-        if(idx > -1) {
-            players[idx].wins += wins;
-            players[idx].goals += goals;
-            players[idx].assists += assists;
+        const docId = name.toLowerCase().replace(/\s+/g, '_');
+        const docRef = playersCol.doc(docId);
+        const doc = await docRef.get();
+
+        if (doc.exists) {
+            await docRef.update({
+                wins: firebase.firestore.FieldValue.increment(wins),
+                goals: firebase.firestore.FieldValue.increment(goals),
+                assists: firebase.firestore.FieldValue.increment(assists)
+            });
         } else {
-            players.push({ name, wins, goals, assists });
+            await docRef.set({ name, wins, goals, assists });
         }
 
-        nameInput.value = "";
-        document.querySelectorAll('input[type="number"]').forEach(i => i.value = "");
-        saveAndRender();
+        document.querySelectorAll('input').forEach(i => i.value = "");
+    }
+
+    // Funkcja usuwania
+    function deletePlayer(id) {
+        if (confirm("Usunąć zawodnika?")) playersCol.doc(id).delete();
+    }
+
+    // Funkcja bezpośredniej edycji[span_5](start_span)[span_5](end_span)
+    function updateValue(id, field, value) {
+        const updateData = {};
+        updateData[field] = parseInt(value) || 0;
+        playersCol.doc(id).update(updateData);
+    }
+
+    // Słuchacz bazy danych w czasie rzeczywistym[span_6](start_span)[span_6](end_span)[span_7](start_span)[span_7](end_span)
+    playersCol.onSnapshot(snapshot => {
+        const players = [];
+        snapshot.forEach(doc => players.push({ id: doc.id, ...doc.data() }));
+        render(players);
     });
 
-    function updateVal(index, field, val) {
-        players[index][field] = parseInt(val) || 0;
-        saveAndRender();
-    }
-
-    function removeP(index) {
-        if(confirm("Czy na pewno chcesz usunąć tego zawodnika?")) {
-            players.splice(index, 1);
-            saveAndRender();
-        }
-    }
-
-    function render() {
-        // Obliczanie punktów: Zwycięstwa*3 + Gole + Asysty[span_3](start_span)[span_3](end_span)[span_4](start_span)[span_4](end_span)
-        const sorted = players.map((p, i) => ({
-            ...p, 
-            originalIndex: i,
+    function render(players) {
+        const sorted = players.map(p => ({
+            ...p,
             total: (p.wins * 3) + p.goals + p.assists
         })).sort((a, b) => b.total - a.total);
 
+        // Tabela główna
         const body = document.getElementById('playerBody');
-        body.innerHTML = "";
-
-        sorted.forEach((p, i) => {
-            const row = document.createElement('tr');
-            if(i === 0) row.className = 'rank-1-row';
-            row.innerHTML = `
+        body.innerHTML = sorted.map((p, i) => `
+            <tr class="${i === 0 ? 'rank-1-row' : ''}">
                 <td><b>${i+1}</b></td>
                 <td>${p.name}</td>
-                <td><input type="number" class="edit-input" value="${p.wins}" onchange="updateVal(${p.originalIndex}, 'wins', this.value)"></td>
-                <td><input type="number" class="edit-input" value="${p.goals}" onchange="updateVal(${p.originalIndex}, 'goals', this.value)"></td>
-                <td><input type="number" class="edit-input" value="${p.assists}" onchange="updateVal(${p.originalIndex}, 'assists', this.value)"></td>
-                <td style="color:var(--primary); font-weight:bold; font-size:16px;">${p.total}</td>
-                <td><button onclick="removeP(${p.originalIndex})" style="background:#475569; padding:4px 10px; font-size:11px;">USUŃ</button></td>
-            `;
-            body.appendChild(row);
-        });
+                <td><input type="number" class="edit-input" value="${p.wins}" onchange="updateValue('${p.id}', 'wins', this.value)"></td>
+                <td><input type="number" class="edit-input" value="${p.goals}" onchange="updateValue('${p.id}', 'goals', this.value)"></td>
+                <td><input type="number" class="edit-input" value="${p.assists}" onchange="updateValue('${p.id}', 'assists', this.value)"></td>
+                <td style="color:var(--primary); font-weight:bold;">${p.total}</td>
+                <td><button onclick="deletePlayer('${p.id}')" style="background:#444; font-size:10px;">X</button></td>
+            </tr>
+        `).join('');
 
-        // Obsługa Podium[span_5](start_span)[span_5](end_span)
+        // Podium[span_8](start_span)[span_8](end_span)
         document.getElementById('p1-name').innerText = sorted[0] ? sorted[0].name : "-";
         document.getElementById('p2-name').innerText = sorted[1] ? sorted[1].name : "-";
         document.getElementById('p3-name').innerText = sorted[2] ? sorted[2].name : "-";
 
-        // Widgety TOP 3
-        const fill = (id, field) => {
+        // Topki boczne
+        const fillTop = (id, field) => {
             const top = [...players].sort((a,b) => b[field] - a[field]).slice(0, 3);
-            document.getElementById(id).innerHTML = top.length ? top.map(p => `
-                <div class="top-row"><span>${p.name}</span><b>${p[field]}</b></div>
-            `).join('') : "Brak danych";
+            document.getElementById(id).innerHTML = top.map(p => `
+                <div style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px dashed #ccc;">
+                    <span>${p.name}</span><b>${p[field]}</b>
+                </div>
+            `).join('');
         };
-        fill('sideGoals', 'goals');
-        fill('sideAssists', 'assists');
+        fillTop('sideGoals', 'goals');
+        fillTop('sideAssists', 'assists');
     }
-
-    render();
 </script>
 
 </body>
