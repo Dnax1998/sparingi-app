@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statystyki Zawodników</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --bg: #f8fafc;
+            --text: #1e293b;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 { text-align: center; color: var(--primary); }
+
+        .input-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f1f5f9;
+            border-radius: 8px;
+        }
+
+        input {
+            padding: 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            outline: none;
+        }
+
+        input:focus { border-color: var(--primary); }
+
+        button {
+            padding: 10px 20px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: opacity 0.2s;
+        }
+
+        button:hover { opacity: 0.9; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th {
+            background-color: #e2e8f0;
+            padding: 12px;
+            text-align: left;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        tr:hover { background-color: #f8fafc; }
+
+        .total-pts { font-weight: bold; color: var(--primary); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>🏆 Tabela Wyników</h2>
+
+    <div class="input-group">
+        <input type="text" id="name" placeholder="Imię i Nazwisko">
+        <input type="number" id="wins" placeholder="Zwycięstwa" min="0">
+        <input type="number" id="goals" placeholder="Gole" min="0">
+        <input type="number" id="assists" placeholder="Asysty" min="0">
+        <button onclick="addPlayer()">Dodaj Zawodnika</button>
+    </div>
+
+    <table id="statsTable">
+        <thead>
+            <tr>
+                <th>Zawodnik</th>
+                <th>Zwycięstwa (x3)</th>
+                <th>Gole (x1)</th>
+                <th>Asysty (x1)</th>
+                <th>Suma Punktów</th>
+                <th>Akcja</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Tutaj pojawią się dane -->
+        </tbody>
+    </table>
+</div>
+
+<script>
+    function addPlayer() {
+        const name = document.getElementById('name').value;
+        const wins = parseInt(document.getElementById('wins').value) || 0;
+        const goals = parseInt(document.getElementById('goals').value) || 0;
+        const assists = parseInt(document.getElementById('assists').value) || 0;
+
+        if (name === "") {
+            alert("Proszę podać imię i nazwisko!");
+            return;
+        }
+
+        // Obliczanie punktów: Zwycięstwo * 3 + Gole + Asysty
+        const totalPoints = (wins * 3) + goals + assists;
+
+        const table = document.getElementById('statsTable').getElementsByTagName('tbody')[0];
+        const newRow = table.insertRow();
+
+        newRow.innerHTML = `
+            <td>${name}</td>
+            <td>${wins}</td>
+            <td>${goals}</td>
+            <td>${assists}</td>
+            <td class="total-pts">${totalPoints}</td>
+            <td><button style="background: #ef4444; padding: 5px 10px;" onclick="deleteRow(this)">Usuń</button></td>
+        `;
+
+        // Sortowanie tabeli po dodaniu (opcjonalnie)
+        sortTable();
+
+        // Czyszczenie pól
+        document.getElementById('name').value = '';
+        document.getElementById('wins').value = '';
+        document.getElementById('goals').value = '';
+        document.getElementById('assists').value = '';
+    }
+
+    function deleteRow(btn) {
+        const row = btn.parentNode.parentNode;
+        row.parentNode.removeChild(row);
+    }
+
+    function sortTable() {
+        const table = document.getElementById("statsTable");
+        let switching = true;
+        while (switching) {
+            switching = false;
+            const rows = table.rows;
+            for (let i = 1; i < (rows.length - 1); i++) {
+                let shouldSwitch = false;
+                const x = rows[i].getElementsByTagName("TD")[4];
+                const y = rows[i + 1].getElementsByTagName("TD")[4];
+                if (Number(x.innerHTML) < Number(y.innerHTML)) {
+                    shouldSwitch = true;
+                    break;
+                }
+                if (shouldSwitch) {
+                    rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                    switching = true;
+                }
+            }
+        }
+    }
+</script>
+
+</body>
+</html>
